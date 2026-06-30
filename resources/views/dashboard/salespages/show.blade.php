@@ -7,6 +7,9 @@
                 <span><strong>Salespage disimpan!</strong> Klik <strong>Terbitkan</strong> untuk go live, atau buka pautan untuk pratonton. Semua salespage anda ada di <a href="{{ route('salespages.index') }}" class="underline">Salespage</a>.</span>
             </div>
         @endif
+        @if (session('ok'))
+            <div class="flex items-center gap-2.5 rounded-[var(--radius-md)] border border-success/30 bg-success-soft/50 px-4 py-3 text-sm text-success"><x-lucide-circle-check class="size-5 shrink-0" /> {{ session('ok') }}</div>
+        @endif
         <div class="flex flex-wrap items-center gap-3">
             <a href="{{ route('salespages.index') }}" class="inline-flex size-9 items-center justify-center rounded-[var(--radius-md)] border border-border text-ink-soft hover:bg-muted-surface"><x-lucide-arrow-left class="size-4.5" /></a>
             <div class="min-w-0">
@@ -85,7 +88,7 @@
         </div>
 
         {{-- Settings --}}
-        <div x-show="tab==='settings'" x-cloak>
+        <div x-show="tab==='settings'" x-cloak class="space-y-6">
             <x-ui.card>
                 <x-ui.card-header title="Maklumat asas" />
                 <x-ui.card-body>
@@ -95,6 +98,22 @@
                         <x-ui.field label="Harga coret (RM)"><x-ui.input name="compare_price" type="number" value="{{ $salespage->compare_price }}" /></x-ui.field>
                         <input type="hidden" name="gateway" value="{{ $salespage->gateway }}">
                         <div class="sm:col-span-2"><x-ui.button type="submit">Simpan perubahan</x-ui.button></div>
+                    </form>
+                </x-ui.card-body>
+            </x-ui.card>
+            <x-ui.card>
+                <x-ui.card-header title="Tracking & Pemasaran" subtitle="Pixel untuk ukur ads + countdown untuk urgency" />
+                <x-ui.card-body>
+                    <form method="POST" action="{{ route('salespages.update', $salespage) }}" class="grid max-w-2xl gap-5 sm:grid-cols-2">@csrf @method('PUT')
+                        <input type="hidden" name="title" value="{{ $salespage->title }}">
+                        <input type="hidden" name="price" value="{{ $salespage->price }}">
+                        <input type="hidden" name="compare_price" value="{{ $salespage->compare_price }}">
+                        <input type="hidden" name="gateway" value="{{ $salespage->gateway }}">
+                        <x-ui.field label="Facebook / Meta Pixel ID" hint="auto-fire PageView + Purchase"><x-ui.input name="fb_pixel" value="{{ $salespage->fb_pixel }}" placeholder="cth. 1023456789012345" /></x-ui.field>
+                        <x-ui.field label="TikTok Pixel ID" hint="auto-fire ViewContent + CompletePayment"><x-ui.input name="tiktok_pixel" value="{{ $salespage->tiktok_pixel }}" placeholder="cth. C1ABCD2EF3GH4..." /></x-ui.field>
+                        <x-ui.field label="Google Analytics ID" hint="GA4 / Google tag"><x-ui.input name="ga_id" value="{{ $salespage->ga_id }}" placeholder="cth. G-XXXXXXXXXX" /></x-ui.field>
+                        <x-ui.field label="Tawaran tamat (countdown)" hint="kosong = tiada timer"><x-ui.input name="offer_ends_at" type="datetime-local" value="{{ $salespage->offer_ends_at?->format('Y-m-d\TH:i') }}" /></x-ui.field>
+                        <div class="sm:col-span-2"><x-ui.button type="submit">Simpan tetapan pemasaran</x-ui.button></div>
                     </form>
                 </x-ui.card-body>
             </x-ui.card>

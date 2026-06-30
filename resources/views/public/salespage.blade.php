@@ -1,6 +1,38 @@
 <x-layouts.base :title="$salespage->title" :force-light="true">
     @php $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); $price = (float) $salespage->price;
-    $states = ['Selangor', 'Kuala Lumpur', 'Johor', 'Pulau Pinang', 'Perak', 'Kedah', 'Kelantan', 'Terengganu', 'Pahang', 'Melaka', 'Negeri Sembilan', 'Perlis', 'Sabah', 'Sarawak', 'Putrajaya', 'Labuan']; @endphp
+    $states = ['Selangor', 'Kuala Lumpur', 'Johor', 'Pulau Pinang', 'Perak', 'Kedah', 'Kelantan', 'Terengganu', 'Pahang', 'Melaka', 'Negeri Sembilan', 'Perlis', 'Sabah', 'Sarawak', 'Putrajaya', 'Labuan'];
+    $ordered = session('ordered'); @endphp
+
+    {{-- Tracking pixels --}}
+    @if ($salespage->fb_pixel)
+        <script>
+            !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+            fbq('init', @json($salespage->fb_pixel)); fbq('track', 'PageView');
+            @if ($ordered) fbq('track', 'Purchase', {value: {{ $price }}, currency: 'MYR'}); @endif
+        </script>
+    @endif
+    @if ($salespage->tiktok_pixel)
+        <script>
+            !function(w,d,t){w.TiktokAnalyticsObject=t;var ttq=w[t]=w[t]||[];ttq.methods=["page","track","identify","instances","debug","on","off","once","ready","alias","group","enableCookie","disableCookie"];ttq.setAndDefer=function(t,e){t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}};for(var i=0;i<ttq.methods.length;i++)ttq.setAndDefer(ttq,ttq.methods[i]);ttq.instance=function(t){for(var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n]);return e};ttq.load=function(e,n){var i="https://analytics.tiktok.com/i18n/pixel/events.js";ttq._i=ttq._i||{};ttq._i[e]=[];ttq._i[e]._u=i;ttq._t=ttq._t||{};ttq._t[e]=+new Date;ttq._o=ttq._o||{};ttq._o[e]=n||{};var o=d.createElement("script");o.type="text/javascript";o.async=!0;o.src=i+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)};ttq.load(@json($salespage->tiktok_pixel));ttq.page();
+            @if ($ordered) ttq.track('CompletePayment', {value: {{ $price }}, currency: 'MYR'}); @endif
+            }(window,document,'ttq');
+        </script>
+    @endif
+    @if ($salespage->ga_id)
+        <script async src="https://www.googletagmanager.com/gtag/js?id={{ $salespage->ga_id }}"></script>
+        <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config',@json($salespage->ga_id));@if ($ordered)gtag('event','purchase',{value:{{ $price }},currency:'MYR'});@endif</script>
+    @endif
+
+    {{-- Countdown urgency bar --}}
+    @if ($salespage->offer_ends_at && $salespage->offer_ends_at->isFuture())
+        <div x-data="{ end: {{ $salespage->offer_ends_at->getTimestamp() }} * 1000, label: 'Tawaran tamat dalam', t: '',
+                tick() { var d = this.end - Date.now(); if (d <= 0) { this.label = 'Tawaran tamat'; this.t = ''; return; } var h = Math.floor(d/3.6e6), m = Math.floor(d%3.6e6/6e4), s = Math.floor(d%6e4/1e3); this.t = (h<10?'0':'')+h+':'+(m<10?'0':'')+m+':'+(s<10?'0':'')+s; } }"
+             x-init="tick(); setInterval(() => tick(), 1000)"
+             class="sticky top-0 z-40 flex items-center justify-center gap-2 bg-primary px-4 py-2.5 text-center text-sm font-semibold text-primary-fg shadow-md">
+            <x-lucide-clock class="size-4 shrink-0" /> <span x-text="label"></span> <span x-text="t" class="font-bold tabular-nums"></span>
+        </div>
+    @endif
+
     <div class="min-h-screen bg-muted-surface/40 pb-28 pt-6">
         <div class="mx-auto max-w-md overflow-hidden rounded-[var(--radius-xl)] border border-border bg-bg elev-2">
             @include('partials.salespage', ['page' => $page])

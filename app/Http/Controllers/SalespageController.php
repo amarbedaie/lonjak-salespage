@@ -51,6 +51,10 @@ class SalespageController extends Controller
             'price' => 'required|numeric|min:0',
             'compare_price' => 'nullable|numeric|min:0',
             'gateway' => 'nullable|string',
+            'fb_pixel' => 'nullable|string|max:50',
+            'tiktok_pixel' => 'nullable|string|max:50',
+            'ga_id' => 'nullable|string|max:50',
+            'offer_ends_at' => 'nullable|date',
         ]);
         $salespage->update($data);
 

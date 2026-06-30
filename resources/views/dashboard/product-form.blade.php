@@ -61,8 +61,8 @@
                         </div>
                         <p class="text-xs text-muted">Nyahtanda untuk buang gambar.</p>
                     @endif
-                    <div class="relative flex flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border-2 border-dashed border-border bg-muted-surface/40 px-6 py-8 text-center hover:bg-muted-surface">
-                        <input type="file" name="images[]" accept="image/*" multiple class="absolute inset-0 z-10 cursor-pointer opacity-0" aria-label="Pilih gambar">
+                    <div x-data class="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-[var(--radius-lg)] border-2 border-dashed border-border bg-muted-surface/40 px-6 py-8 text-center hover:bg-muted-surface" @click="$refs.fi.click()" role="button" tabindex="0" @keydown.enter="$refs.fi.click()">
+                        <input type="file" name="images[]" x-ref="fi" accept="image/*" multiple class="hidden">
                         <x-lucide-image-plus class="size-7 text-muted" />
                         <span class="text-sm font-medium text-ink">Klik untuk pilih gambar</span>
                         <span class="text-xs text-muted">JPG/PNG, sehingga 5MB setiap satu. Boleh pilih banyak.</span>

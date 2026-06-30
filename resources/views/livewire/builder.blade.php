@@ -125,8 +125,8 @@
                     </x-ui.field>
 
                     <x-ui.field label="Gambar produk" hint="pilihan — akan dipapar pada salespage">
-                        <div class="relative flex items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface">
-                            <input type="file" wire:model="newImages" multiple accept="image/*" class="absolute inset-0 z-10 cursor-pointer opacity-0" aria-label="Muat naik gambar">
+                        <div x-data class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface" @click="$refs.fi.click()" role="button" tabindex="0" @keydown.enter="$refs.fi.click()">
+                            <input type="file" wire:model="newImages" x-ref="fi" multiple accept="image/*" class="hidden">
                             <x-lucide-image-plus class="size-5 shrink-0 text-muted" />
                             <span wire:loading.remove wire:target="newImages">Klik untuk muat naik gambar (boleh banyak)</span>
                             <span wire:loading wire:target="newImages" class="text-primary">Memuat naik…</span>

@@ -95,12 +95,12 @@
                     </x-ui.field>
 
                     <x-ui.field label="Gambar produk" hint="pilihan — akan dipapar pada salespage">
-                        <label class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface">
-                            <x-lucide-image-plus class="size-5 text-muted" />
+                        <div class="relative flex items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface">
+                            <input type="file" wire:model="newImages" multiple accept="image/*" class="absolute inset-0 z-10 cursor-pointer opacity-0" aria-label="Muat naik gambar">
+                            <x-lucide-image-plus class="size-5 shrink-0 text-muted" />
                             <span wire:loading.remove wire:target="newImages">Klik untuk muat naik gambar (boleh banyak)</span>
                             <span wire:loading wire:target="newImages" class="text-primary">Memuat naik…</span>
-                            <input type="file" wire:model="newImages" multiple accept="image/*" class="hidden">
-                        </label>
+                        </div>
                         @error('newImages.*')<p class="mt-1 text-xs text-danger">{{ $message }}</p>@enderror
                         @if ($images)
                             <div class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">

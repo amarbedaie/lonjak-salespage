@@ -1,5 +1,5 @@
 <x-layouts.app :title="$salespage->title">
-    @php $rm = fn ($n) => 'RM'.number_format($n, 2); $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); @endphp
+    @php $rm = fn ($n) => 'RM'.number_format($n, 2); $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url, 'theme' => $salespage->theme]); @endphp
     <div class="space-y-6" x-data="{ tab: 'design' }">
         @if (session('saved'))
             <div class="flex items-center gap-2.5 rounded-[var(--radius-md)] border border-success/30 bg-success-soft/50 px-4 py-3 text-sm text-success">
@@ -96,6 +96,13 @@
                         <x-ui.field label="Tajuk salespage"><x-ui.input name="title" value="{{ $salespage->title }}" /></x-ui.field>
                         <x-ui.field label="Harga (RM)"><x-ui.input name="price" type="number" value="{{ $salespage->price }}" /></x-ui.field>
                         <x-ui.field label="Harga coret (RM)"><x-ui.input name="compare_price" type="number" value="{{ $salespage->compare_price }}" /></x-ui.field>
+                        <x-ui.field label="Tema warna" hint="rupa salespage">
+                            <x-ui.select name="theme">
+                                @foreach (['default' => 'Pink (default)', 'hijau' => 'Hijau Islamik + Emas', 'biru' => 'Teal / Biru', 'oren' => 'Oren Hangat', 'gelap' => 'Gelap'] as $v => $l)
+                                    <option value="{{ $v }}" @selected(($salespage->theme ?? 'default') === $v)>{{ $l }}</option>
+                                @endforeach
+                            </x-ui.select>
+                        </x-ui.field>
                         <input type="hidden" name="gateway" value="{{ $salespage->gateway }}">
                         <div class="sm:col-span-2"><x-ui.button type="submit">Simpan perubahan</x-ui.button></div>
                     </form>

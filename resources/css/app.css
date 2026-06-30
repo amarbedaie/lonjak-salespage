@@ -1,4 +1,4 @@
-@import url('https://fonts.bunny.net/css?family=geist:400,500,600,700|geist-mono:400,500');
+@import url('https://fonts.bunny.net/css?family=geist:400,500,600,700|geist-mono:400,500|fraunces:600,700,900');
 @import 'tailwindcss';
 
 @source '../**/*.blade.php';
@@ -118,6 +118,7 @@
 
   --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'Geist Mono', ui-monospace, monospace;
+  --font-display: 'Fraunces', 'Geist', Georgia, serif;
 
   --radius-sm: 6px;
   --radius-md: 8px;

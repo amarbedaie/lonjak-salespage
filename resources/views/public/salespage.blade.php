@@ -1,5 +1,5 @@
 <x-layouts.base :title="$salespage->title" :force-light="true">
-    @php $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); $price = (float) $salespage->price;
+    @php $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url, 'theme' => $salespage->theme]); $price = (float) $salespage->price;
     $states = ['Selangor', 'Kuala Lumpur', 'Johor', 'Pulau Pinang', 'Perak', 'Kedah', 'Kelantan', 'Terengganu', 'Pahang', 'Melaka', 'Negeri Sembilan', 'Perlis', 'Sabah', 'Sarawak', 'Putrajaya', 'Labuan'];
     $ordered = session('ordered'); @endphp
 

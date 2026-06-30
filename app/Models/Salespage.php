@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'title', 'slug', 'product_name', 'price', 'compare_price', 'category', 'status', 'gateway', 'brief', 'blocks', 'images', 'video_url', 'visits', 'fb_pixel', 'tiktok_pixel', 'ga_id', 'offer_ends_at'])]
+#[Fillable(['user_id', 'title', 'slug', 'product_name', 'price', 'compare_price', 'category', 'theme', 'status', 'gateway', 'brief', 'blocks', 'images', 'video_url', 'visits', 'fb_pixel', 'tiktok_pixel', 'ga_id', 'offer_ends_at'])]
 class Salespage extends Model
 {
     protected function casts(): array

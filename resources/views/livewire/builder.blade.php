@@ -125,12 +125,12 @@
                     </x-ui.field>
 
                     <x-ui.field label="Gambar produk" hint="pilihan — akan dipapar pada salespage">
-                        <div x-data class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface" @click="$refs.fi.click()" role="button" tabindex="0" @keydown.enter="$refs.fi.click()">
-                            <input type="file" wire:model="newImages" x-ref="fi" multiple accept="image/*" class="hidden">
+                        <label for="builder-img-upload" class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface">
+                            <input id="builder-img-upload" type="file" wire:model="newImages" multiple accept="image/*" class="sr-only">
                             <x-lucide-image-plus class="size-5 shrink-0 text-muted" />
                             <span wire:loading.remove wire:target="newImages">Klik untuk muat naik gambar (boleh banyak)</span>
                             <span wire:loading wire:target="newImages" class="text-primary">Memuat naik…</span>
-                        </div>
+                        </label>
                         @error('newImages.*')<p class="mt-1 text-xs text-danger">{{ $message }}</p>@enderror
                         @if ($images)
                             <div class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
@@ -234,7 +234,7 @@
                     <x-ui.card-body class="bg-muted-surface/60 p-5">
                         <div class="mx-auto max-w-[380px] overflow-hidden rounded-[24px] border-[6px] border-ink/90 bg-bg shadow-2xl">
                             <div class="max-h-[640px] overflow-y-auto scroll-thin">
-                                @include('partials.salespage', ['page' => array_merge($page, ['images' => collect($images)->map(fn ($p) => asset('storage/'.$p))->all(), 'video' => $videoUrl])])
+                                @include('partials.salespage', ['page' => array_merge($page, ['images' => collect($images)->map(fn ($p) => asset('storage/'.$p))->all(), 'video' => $videoUrl, 'theme' => 'default'])])
                             </div>
                         </div>
                     </x-ui.card-body>

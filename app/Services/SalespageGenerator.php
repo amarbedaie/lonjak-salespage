@@ -33,22 +33,24 @@ TXT;
     {
         if ($key = config('services.openrouter.key')) {
             try {
-                return ['page' => $this->viaOpenRouter($brief, $key), 'source' => 'openrouter'];
+                return ['page' => self::normalizeBlocks($this->viaOpenRouter($brief, $key)), 'source' => 'openrouter'];
             } catch (Throwable $e) {
                 report($e);
             }
         }
-        return ['page' => $this->mock($brief), 'source' => 'mock'];
+        return ['page' => self::normalizeBlocks($this->mock($brief)), 'source' => 'mock'];
     }
 
     private function viaOpenRouter(array $brief, string $key): array
     {
         $model = config('services.openrouter.model', 'anthropic/claude-3.5-haiku');
         $system = self::FRAMEWORK
-            . "\n\nPULANGKAN HANYA satu objek JSON sah dengan kunci \"blocks\" (array). "
-            . "Setiap blok ada: type (salah satu: " . implode(', ', array_keys(self::BLOCK_LABELS)) . "), "
-            . "label, dan kandungan sesuai (headline, body, bullets[] , items[{q,a}], meta{price,compare}). "
-            . "Untuk offer & cta, isi meta.price & meta.compare dengan nombor.";
+            . "\n\nPULANGKAN HANYA satu objek JSON sah: {\"blocks\": [ ... ]}. "
+            . "Setiap blok MESTI guna kunci ARAS ATAS ini secara LANGSUNG — JANGAN sarang dalam objek lain (cth JANGAN guna \"kandungan\"): "
+            . "type (salah satu: " . implode(', ', array_keys(self::BLOCK_LABELS)) . "), label, headline, body, "
+            . "bullets (array string), items (array objek {q,a} untuk proof & faq), meta ({price, compare} nombor untuk offer & cta). "
+            . "Guna nama kunci TEPAT ini sahaja — JANGAN guna subheadline/subtitle/cta_text/description. "
+            . "Contoh satu blok: {\"type\":\"hero\",\"label\":\"Hero\",\"headline\":\"Tajuk utama\",\"body\":\"Ayat sokongan\",\"bullets\":[\"poin 1\",\"poin 2\"]}";
 
         $res = Http::withToken($key)
             ->withHeaders(['HTTP-Referer' => config('app.url'), 'X-Title' => 'Mendap'])
@@ -101,6 +103,97 @@ TXT;
         $start = strpos($text, '{');
         $end = strrpos($text, '}');
         return ($start !== false && $end !== false) ? substr($text, $start, $end - $start + 1) : $text;
+    }
+
+    /**
+     * Normalize block output to the canonical flat schema the Blade views expect.
+     * Models vary: some nest content under a "kandungan"/"content" wrapper or use
+     * aliases like "subheadline". This flattens + remaps so rendering never breaks.
+     */
+    public static function normalizeBlocks(array $page): array
+    {
+        $blocks = $page['blocks'] ?? (array_is_list($page) ? $page : []);
+
+        return ['blocks' => array_values(array_filter(array_map(
+            fn ($b) => is_array($b) ? self::normalizeBlock($b) : null,
+            $blocks
+        )))];
+    }
+
+    private static function normalizeBlock(array $b): array
+    {
+        // Flatten a nested content wrapper if the model used one.
+        foreach (['kandungan', 'content', 'isi', 'data', 'fields'] as $wrap) {
+            if (isset($b[$wrap]) && is_array($b[$wrap])) {
+                $b = array_merge($b[$wrap], array_diff_key($b, [$wrap => true]));
+                unset($b[$wrap]);
+            }
+        }
+
+        // Remap common aliases to canonical names (only when the canonical is empty).
+        $aliases = [
+            'headline' => ['heading', 'title', 'tajuk', 'header'],
+            'body' => ['subheadline', 'sub_headline', 'subheading', 'subtitle', 'description', 'desc', 'text', 'paragraph'],
+            'bullets' => ['bullet', 'points', 'list', 'features', 'kelebihan'],
+            'items' => ['faqs', 'questions', 'testimonials', 'qa', 'soalan'],
+        ];
+        foreach ($aliases as $canon => $variants) {
+            if (empty($b[$canon])) {
+                foreach ($variants as $v) {
+                    if (! empty($b[$v])) {
+                        $b[$canon] = $b[$v];
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (isset($b['bullets'])) {
+            $b['bullets'] = self::toStringList($b['bullets']);
+        }
+        if (isset($b['items']) && is_array($b['items'])) {
+            $b['items'] = array_values(array_filter(array_map(function ($it) {
+                if (! is_array($it)) {
+                    return null;
+                }
+
+                return [
+                    'q' => (string) ($it['q'] ?? $it['question'] ?? $it['name'] ?? $it['title'] ?? ''),
+                    'a' => (string) ($it['a'] ?? $it['answer'] ?? $it['text'] ?? $it['body'] ?? ''),
+                ];
+            }, $b['items'])));
+        }
+        if (isset($b['meta']) && is_array($b['meta'])) {
+            $b['meta'] = [
+                'price' => $b['meta']['price'] ?? $b['meta']['harga'] ?? null,
+                'compare' => $b['meta']['compare'] ?? $b['meta']['compare_price'] ?? $b['meta']['coret'] ?? null,
+            ];
+        } elseif (isset($b['price']) || isset($b['compare'])) {
+            $b['meta'] = ['price' => $b['price'] ?? null, 'compare' => $b['compare'] ?? null];
+        }
+
+        return $b;
+    }
+
+    private static function toStringList(mixed $v): array
+    {
+        if (is_string($v)) {
+            $parts = preg_split('/\r?\n|•|;/', $v);
+            $v = count($parts) > 1 ? $parts : [$v];
+        }
+        if (! is_array($v)) {
+            return [];
+        }
+        $out = [];
+        foreach ($v as $item) {
+            if (is_string($item)) {
+                $out[] = trim($item);
+            } elseif (is_array($item)) {
+                $out[] = trim((string) ($item['text'] ?? $item['title'] ?? $item['label'] ?? reset($item)));
+            }
+        }
+
+        return array_values(array_filter($out, fn ($s) => $s !== ''));
     }
 
     /** Deterministic local mock — same shape as the AI output. */

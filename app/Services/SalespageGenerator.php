@@ -118,7 +118,7 @@ TXT;
             ->timeout(90)
             ->post('https://openrouter.ai/api/v1/chat/completions', [
                 'model' => $model,
-                'max_tokens' => 11000,
+                'max_tokens' => 8000,
                 'reasoning' => ['effort' => 'low'],
                 'response_format' => ['type' => 'json_object'],
                 'messages' => [
@@ -185,14 +185,14 @@ TXT;
         }
 
         try {
-            $model = config('services.openrouter.model', 'anthropic/claude-haiku-4.5');
+            $model = config('services.openrouter.copy_model') ?: 'anthropic/claude-sonnet-4.6';
             $sys = $this->systemPrompt();
             $userPrompt = $this->prompt($brief);
             $responses = Http::pool(fn ($pool) => array_map(
                 fn ($angle) => $pool->withToken($key)->withHeaders(['X-Title' => 'Mendap'])->timeout(120)
                     ->post('https://openrouter.ai/api/v1/chat/completions', [
                         'model' => $model,
-                        'max_tokens' => 11000,
+                        'max_tokens' => 16000,
                         'response_format' => ['type' => 'json_object'],
                         'messages' => [
                             ['role' => 'system', 'content' => $sys . "\n\nSUDUT VARIASI INI — " . $angle],

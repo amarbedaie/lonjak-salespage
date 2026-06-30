@@ -163,9 +163,9 @@ TXT;
     public function generateVariants(array $brief, int $count = 3): array
     {
         $angles = [
-            'EMOSI & CERITA: pimpin dengan kesakitan emosi terdalam + sentuhan peribadi/spiritual.',
-            'NILAI & OFFER: pimpin dengan offer stack & bukti berbaloi — apa pembeli dapat, kenapa worth it.',
-            'URGENCY & BUKTI SOSIAL: pimpin dengan scarcity jujur, testimoni kuat & FOMO.',
+            'VARIASI EMOSI & CERITA — Mulakan dengan kisah/kesakitan emosi yang sangat peribadi. Headline = soalan yang menusuk hati. Fokus transformasi dalaman & rasa lega. Tona lembut, mendalam, naratif. Headline & sudut MESTI berbeza dari variasi lain.',
+            'VARIASI NILAI & TAWARAN — Mulakan dengan hasil konkrit & offer stack. Headline = janji hasil spesifik + berbaloi. Fokus apa pembeli DAPAT, perbandingan nilai, bundle. Tona yakin, padat, logik. Headline & sudut MESTI berbeza dari variasi lain.',
+            'VARIASI URGENCY & BUKTI SOSIAL — Mulakan dengan bukti sosial & FOMO. Headline = social proof / "ramai dah berubah". Fokus testimoni, jumlah terjual, scarcity jujur, urgency. Tona bertenaga, pantas. Headline & sudut MESTI berbeza dari variasi lain.',
         ];
         $angles = array_slice($angles, 0, max(1, $count));
 
@@ -221,11 +221,14 @@ TXT;
         try {
             $name = $brief['name'] ?? 'produk';
             $cat = $brief['category'] ?? '';
-            $prompt = "Cipta satu poster produk e-commerce premium & menarik untuk salespage Malaysia: \"{$name}\""
-                . ($cat ? " (kategori {$cat})" : '') . '. Mockup produk realistik, pencahayaan studio, latar gradien lembut kemas, '
-                . 'komposisi tengah, gaya iklan Facebook/Instagram convert tinggi. JANGAN letak sebarang teks/perkataan dalam gambar. Format menegak.';
+            $audience = $brief['audience'] ?? '';
+            $prompt = "Professional PHOTOREALISTIC product photograph for a high-converting e-commerce salespage. "
+                . "Product: \"{$name}\"" . ($cat ? " (category: {$cat})" : '') . ($audience ? ", for {$audience}" : '') . '. '
+                . 'Render an accurate, believable real-life product/mockup that fits this exact product, with tasteful props & setting that match its theme. '
+                . 'Style: realistic commercial product photography, soft natural lighting, clean elegant background, shallow depth of field, sharp focus, premium, high detail. '
+                . 'STRICT: photorealistic only — absolutely NOT a cartoon, NOT an illustration, NOT a stylised 3D cartoon. No text/words/watermark in the image.';
             $res = Http::withToken($key)->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
-                'model' => 'google/gemini-2.5-flash-image',
+                'model' => 'google/gemini-3-pro-image',
                 'modalities' => ['image', 'text'],
                 'messages' => [['role' => 'user', 'content' => $prompt]],
             ]);

@@ -136,14 +136,27 @@ class Builder extends Component
         }
     }
 
-    /** Auto-fired after variants render — generate the AI poster separately (keeps generate() fast). */
+    /** Auto-fired after variants render — AI poster ONLY if merchant has no real product image (smart). */
     public function makePoster(SalespageGenerator $gen): void
     {
-        if ($this->posterDone) {
+        if ($this->posterDone || ! empty($this->images)) {
+            $this->posterDone = true;
+
             return;
         }
+        $this->genPoster($gen);
+    }
+
+    /** Manual button — force an AI poster even when product images already exist. */
+    public function forcePoster(SalespageGenerator $gen): void
+    {
+        $this->genPoster($gen);
+    }
+
+    private function genPoster(SalespageGenerator $gen): void
+    {
         $this->posterDone = true;
-        if ($poster = $gen->generatePoster(['name' => $this->name, 'category' => $this->category])) {
+        if ($poster = $gen->generatePoster(['name' => $this->name, 'category' => $this->category, 'audience' => $this->audience])) {
             array_unshift($this->images, $poster);
         }
     }

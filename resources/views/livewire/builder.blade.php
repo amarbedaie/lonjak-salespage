@@ -214,15 +214,19 @@
                         <x-ui.button wire:click="back" variant="outline"><x-lucide-rotate-cw class="size-4" /> Edit brief</x-ui.button>
                         <x-ui.button wire:click="generate" x-on:click="genBegin()" variant="outline"><x-lucide-sparkles class="size-4" /> Jana semula</x-ui.button>
                     </div>
+                    <x-ui.button wire:click="forcePoster" wire:loading.attr="disabled" wire:target="forcePoster" variant="ghost" size="sm">
+                        <span wire:loading.remove wire:target="forcePoster" class="flex items-center gap-2"><x-lucide-image class="size-4" /> Jana poster AI baru</span>
+                        <span wire:loading wire:target="forcePoster" class="flex items-center gap-2"><x-lucide-loader-circle class="size-4 animate-spin" /> Menjana poster…</span>
+                    </x-ui.button>
                 </div>
             </div>
             <div class="lg:col-span-3">
                 <x-ui.card class="overflow-hidden">
-                    @if (! $posterDone)<div wire:init="makePoster"></div>@endif
+                    @if (! $posterDone && ! count($images))<div wire:init="makePoster"></div>@endif
                     <x-ui.card-header title="Pratonton langsung">
                         <x-slot:action>
                             <div class="flex items-center gap-2">
-                                <span wire:loading wire:target="makePoster" class="flex items-center gap-1 text-xs font-medium text-primary"><x-lucide-loader-circle class="size-3 animate-spin" /> menjana poster AI…</span>
+                                <span wire:loading wire:target="makePoster,forcePoster" class="flex items-center gap-1 text-xs font-medium text-primary"><x-lucide-loader-circle class="size-3 animate-spin" /> menjana poster AI…</span>
                                 <x-ui.badge tone="muted"><x-lucide-smartphone class="size-3.5" /> Mobile</x-ui.badge>
                             </div>
                         </x-slot:action>

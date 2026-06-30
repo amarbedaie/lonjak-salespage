@@ -1,4 +1,4 @@
-<x-auth-shell title="Mula dengan Lonjak" subtitle="Bina salespage pertama anda hari ini — Plan Pro RM89/bulan.">
+<x-auth-shell title="Mula dengan Mendap" subtitle="Bina salespage pertama anda hari ini — Plan Pro RM89/bulan.">
     <form method="POST" action="{{ route('register') }}" class="space-y-4">@csrf
         @if ($errors->any())
             <p class="rounded-[var(--radius-md)] border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{{ $errors->first() }}</p>

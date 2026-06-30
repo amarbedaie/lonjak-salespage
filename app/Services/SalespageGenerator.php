@@ -51,7 +51,7 @@ TXT;
             . "Untuk offer & cta, isi meta.price & meta.compare dengan nombor.";
 
         $res = Http::withToken($key)
-            ->withHeaders(['HTTP-Referer' => config('app.url'), 'X-Title' => 'Lonjak'])
+            ->withHeaders(['HTTP-Referer' => config('app.url'), 'X-Title' => 'Mendap'])
             ->timeout(90)
             ->post('https://openrouter.ai/api/v1/chat/completions', [
                 'model' => $model,

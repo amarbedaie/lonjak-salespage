@@ -13,7 +13,7 @@ class ProductionSeeder extends Seeder
         User::firstOrCreate(
             ['email' => 'amarmirza94@gmail.com'],
             [
-                'business_name' => 'Lonjak',
+                'business_name' => 'Mendap',
                 'name' => 'Admin',
                 'password' => 'lonjak2026',
                 'role' => 'admin',

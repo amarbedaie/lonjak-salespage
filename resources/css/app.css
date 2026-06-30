@@ -11,7 +11,7 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------------------------------------------------------------- *
- * Design tokens — Lonjak. OKLCH throughout. (ported from Next.js)
+ * Design tokens — Mendap. OKLCH throughout. (ported from Next.js)
  * ---------------------------------------------------------------- */
 :root {
   --primary: oklch(0.55 0.224 350);

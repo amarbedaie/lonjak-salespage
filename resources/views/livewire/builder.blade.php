@@ -78,7 +78,7 @@
                         <div class="flex items-center gap-2 text-primary">
                             <x-lucide-sparkles class="size-5" /><span class="font-semibold">Jana dengan AI</span>
                         </div>
-                        <p class="mt-2 text-sm text-ink-soft">AI Lonjak guna framework direct-response terbukti — hook, masalah, offer stack, bukti sosial, jaminan, urgency & FAQ — diadaptasi untuk pasaran Malaysia.</p>
+                        <p class="mt-2 text-sm text-ink-soft">AI Mendap guna framework direct-response terbukti — hook, masalah, offer stack, bukti sosial, jaminan, urgency & FAQ — diadaptasi untuk pasaran Malaysia.</p>
                         <div class="mt-4 flex items-center justify-between rounded-[var(--radius-md)] border border-border bg-bg px-3 py-2 text-sm">
                             <span class="text-muted">Kredit AI</span>
                             <span class="font-medium text-ink">{{ auth()->user()->ai_credits }} / 3 tinggal</span>

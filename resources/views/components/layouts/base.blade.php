@@ -5,11 +5,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>{{ $title ? $title.' · Lonjak' : 'Lonjak — Platform Salespage Untuk Usahawan Malaysia' }}</title>
+    <title>{{ $title ? $title.' · Mendap' : 'Mendap — Platform Salespage Untuk Usahawan Malaysia' }}</title>
     <script>
         (function () {
             try {
-                var t = localStorage.getItem('lonjak-theme');
+                var t = localStorage.getItem('mendap-theme');
                 var m = window.matchMedia('(prefers-color-scheme: dark)').matches;
                 if (t === 'dark' || (!t && m)) document.documentElement.classList.add('dark');
             } catch (e) {}

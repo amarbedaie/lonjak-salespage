@@ -49,6 +49,6 @@
             </x-ui.card-body>
         </x-ui.card>
 
-        <p class="px-1 text-xs text-muted">Lonjak tidak kenakan yuran transaksi. Caj pemprosesan BayarCash dikenakan oleh BayarCash. Settlement terus ke akaun bank anda.</p>
+        <p class="px-1 text-xs text-muted">Mendap tidak kenakan yuran transaksi. Caj pemprosesan BayarCash dikenakan oleh BayarCash. Settlement terus ke akaun bank anda.</p>
     </div>
 </x-layouts.app>

@@ -16,7 +16,7 @@
 
         <div class="relative hidden overflow-hidden bg-primary lg:flex lg:flex-col lg:justify-between lg:p-12">
             <div class="pointer-events-none absolute inset-0 opacity-30" style="background: radial-gradient(50% 50% at 80% 20%, white, transparent 60%)"></div>
-            <div class="relative flex items-center gap-2 text-primary-fg"><x-lucide-sparkles class="size-5" /><span class="font-semibold">Lonjak Pro</span></div>
+            <div class="relative flex items-center gap-2 text-primary-fg"><x-lucide-sparkles class="size-5" /><span class="font-semibold">Mendap Pro</span></div>
             <div class="relative">
                 <blockquote class="text-2xl font-medium leading-snug text-primary-fg text-balance">"Dulu seminggu nak siapkan satu salespage. Sekarang sebelum lunch dah live, petang dah ada sale."</blockquote>
                 <p class="mt-4 text-sm text-primary-fg/80">— Faizal, usahawan skincare</p>
@@ -26,7 +26,7 @@
                     @endforeach
                 </ul>
             </div>
-            <div class="relative text-xs text-primary-fg/70">© {{ date('Y') }} Lonjak · ADFusion Marketing</div>
+            <div class="relative text-xs text-primary-fg/70">© {{ date('Y') }} Mendap · ADFusion Marketing</div>
         </div>
     </div>
 </x-layouts.base>

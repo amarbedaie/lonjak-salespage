@@ -6,5 +6,5 @@
             <path d="M15 6h5v5" />
         </svg>
     </span>
-    @if ($text)<span class="text-[1.0625rem] font-semibold tracking-tight text-ink">Lonjak</span>@endif
+    @if ($text)<span class="text-[1.0625rem] font-semibold tracking-tight text-ink">Mendap</span>@endif
 </span>

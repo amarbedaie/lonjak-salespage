@@ -128,5 +128,5 @@
                 @break
         @endswitch
     @endforeach
-    <footer class="border-t border-border px-6 py-6 text-center text-xs text-muted">© {{ date('Y') }} · Dikuasakan oleh <span class="font-semibold text-ink">Lonjak</span></footer>
+    <footer class="border-t border-border px-6 py-6 text-center text-xs text-muted">© {{ date('Y') }} · Dikuasakan oleh <span class="font-semibold text-ink">Mendap</span></footer>
 </div>

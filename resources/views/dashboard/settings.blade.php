@@ -24,7 +24,7 @@
                     <x-ui.card-header title="Langganan" subtitle="Plan & kredit AI" />
                     <x-ui.card-body class="space-y-4">
                         <div class="flex items-center justify-between rounded-[var(--radius-md)] border border-primary/30 bg-primary-soft px-4 py-3">
-                            <div><p class="font-semibold capitalize text-ink">Plan {{ $user->plan }}</p><p class="text-xs text-muted">Diuruskan oleh Lonjak</p></div>
+                            <div><p class="font-semibold capitalize text-ink">Plan {{ $user->plan }}</p><p class="text-xs text-muted">Diuruskan oleh Mendap</p></div>
                             <p class="text-right"><span class="text-lg font-semibold text-ink tnum">RM89</span><span class="text-xs text-muted">/bulan</span></p>
                         </div>
                         <div class="flex items-center justify-between text-sm"><span class="text-ink-soft">Kredit AI</span><span class="font-medium text-ink">{{ $user->ai_credits }} / 3 generasi</span></div>
@@ -35,8 +35,8 @@
                     <x-ui.card-header title="Rupa & tema" />
                     <x-ui.card-body>
                         <div class="grid grid-cols-2 gap-3" x-data="{ dark: document.documentElement.classList.contains('dark') }">
-                            <button @click="dark=false; document.documentElement.classList.remove('dark'); localStorage.setItem('lonjak-theme','light')" :class="!dark ? 'border-primary bg-primary-soft text-primary' : 'border-border text-ink-soft hover:bg-muted-surface'" class="relative flex items-center gap-2 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition-colors"><x-lucide-sun class="size-4" /> Terang</button>
-                            <button @click="dark=true; document.documentElement.classList.add('dark'); localStorage.setItem('lonjak-theme','dark')" :class="dark ? 'border-primary bg-primary-soft text-primary' : 'border-border text-ink-soft hover:bg-muted-surface'" class="relative flex items-center gap-2 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition-colors"><x-lucide-moon class="size-4" /> Gelap</button>
+                            <button @click="dark=false; document.documentElement.classList.remove('dark'); localStorage.setItem('mendap-theme','light')" :class="!dark ? 'border-primary bg-primary-soft text-primary' : 'border-border text-ink-soft hover:bg-muted-surface'" class="relative flex items-center gap-2 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition-colors"><x-lucide-sun class="size-4" /> Terang</button>
+                            <button @click="dark=true; document.documentElement.classList.add('dark'); localStorage.setItem('mendap-theme','dark')" :class="dark ? 'border-primary bg-primary-soft text-primary' : 'border-border text-ink-soft hover:bg-muted-surface'" class="relative flex items-center gap-2 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition-colors"><x-lucide-moon class="size-4" /> Gelap</button>
                         </div>
                     </x-ui.card-body>
                 </x-ui.card>

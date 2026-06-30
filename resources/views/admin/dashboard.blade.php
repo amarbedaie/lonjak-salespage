@@ -1,7 +1,7 @@
 <x-layouts.admin title="Admin">
     @php $rm = fn ($n, $c = false) => $c && $n >= 1000 ? 'RM'.number_format($n / 1000, 1).'k' : 'RM'.number_format($n, 2); @endphp
     <div class="space-y-6">
-        <x-ui.page-header title="Ringkasan platform" description="Prestasi seluruh Lonjak." />
+        <x-ui.page-header title="Ringkasan platform" description="Prestasi seluruh Mendap." />
         <div class="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <x-ui.metric label="Merchant" :value="number_format($stats['merchants'])" />
             <x-ui.metric label="MRR (anggaran)" :value="$rm($stats['mrr'], true)" :footnote="$stats['merchants'].' × RM89'" />

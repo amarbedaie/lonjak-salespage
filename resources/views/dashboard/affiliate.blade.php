@@ -1,6 +1,6 @@
 <x-layouts.app title="Affiliate">
     <div class="space-y-6" x-data="{ copied: false }">
-        <x-ui.page-header title="Affiliate" description="Kongsi Lonjak, dapat komisen berulang 20% setiap bulan untuk setiap rujukan aktif." />
+        <x-ui.page-header title="Affiliate" description="Kongsi Mendap, dapat komisen berulang 20% setiap bulan untuk setiap rujukan aktif." />
 
         <div class="grid gap-6 lg:grid-cols-3">
             <x-ui.card class="bg-gradient-to-br from-primary to-primary-active text-primary-fg">
@@ -35,7 +35,7 @@
             <x-ui.card-header title="Macam mana ia berfungsi" />
             <x-ui.card-body>
                 <ol class="grid gap-4 sm:grid-cols-3">
-                    @foreach ([['mouse-pointer-click', 'Kongsi pautan', 'Hantar pautan rujukan anda kepada usahawan lain.'], ['users', 'Mereka langgan', 'Bila mereka langgan Lonjak guna pautan anda.'], ['repeat', 'Dapat 20% berulang', 'Anda dapat 20% komisen setiap bulan selagi mereka aktif.']] as $i => [$ic, $t, $d])
+                    @foreach ([['mouse-pointer-click', 'Kongsi pautan', 'Hantar pautan rujukan anda kepada usahawan lain.'], ['users', 'Mereka langgan', 'Bila mereka langgan Mendap guna pautan anda.'], ['repeat', 'Dapat 20% berulang', 'Anda dapat 20% komisen setiap bulan selagi mereka aktif.']] as $i => [$ic, $t, $d])
                         <li class="rounded-[var(--radius-lg)] border border-border bg-surface p-5">
                             <span class="flex size-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-fg">{{ $i + 1 }}</span>
                             <x-dynamic-component :component="'lucide-'.$ic" class="mt-3 size-5 text-primary" />

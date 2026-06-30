@@ -1,6 +1,6 @@
 <x-mail.shell title="Order baru">
     <h1 style="margin:0 0 8px;font-size:20px;">Order baru masuk! 🛒</h1>
-    <p style="color:#5a5159;line-height:1.6;">Anda ada tempahan baru di Lonjak:</p>
+    <p style="color:#5a5159;line-height:1.6;">Anda ada tempahan baru di Mendap:</p>
     <table style="width:100%;border-collapse:collapse;margin:16px 0;font-size:14px;">
         <tr><td style="padding:6px 0;color:#9b9097;">Pelanggan</td><td style="padding:6px 0;text-align:right;font-weight:600;">{{ $order->customer }}</td></tr>
         <tr><td style="padding:6px 0;color:#9b9097;">Telefon</td><td style="padding:6px 0;text-align:right;">{{ $order->phone }}</td></tr>

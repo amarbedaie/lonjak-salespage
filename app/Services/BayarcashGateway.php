@@ -57,7 +57,7 @@ class BayarcashGateway
             'order_number' => 'LJK'.$order->id,
             'amount' => number_format((float) $order->total, 2, '.', ''),
             'payer_name' => $order->customer,
-            'payer_email' => $order->email ?: 'pelanggan@lonjak.my',
+            'payer_email' => $order->email ?: 'pelanggan@mendap.com',
             'payer_telephone_number' => preg_replace('/\D/', '', $order->phone) ?: '0123456789',
             'return_url' => route('payment.return'),
             'callback_url' => route('payment.callback'),

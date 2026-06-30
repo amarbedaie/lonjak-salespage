@@ -55,7 +55,7 @@ return [
     'zeptomail' => [
         'token' => env('ZEPTOMAIL_TOKEN'),
         'from' => env('ZEPTOMAIL_FROM_ADDRESS'),
-        'from_name' => env('ZEPTOMAIL_FROM_NAME', 'Lonjak'),
+        'from_name' => env('ZEPTOMAIL_FROM_NAME', 'Mendap'),
     ],
 
 ];

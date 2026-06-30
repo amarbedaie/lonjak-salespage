@@ -106,7 +106,7 @@
             <div class="mx-auto max-w-3xl px-4 sm:px-6">
                 <h2 class="text-center text-3xl font-bold tracking-tight text-ink text-balance">Soalan lazim</h2>
                 <div class="mt-8 divide-y divide-border rounded-[var(--radius-lg)] border border-border bg-bg">
-                    @foreach ([['Perlu pandai coding atau design?', 'Tak perlu langsung. Brief produk anda, AI jana salespage penuh.'], ['Gateway & kurier apa disokong?', 'Bayaran: BayarCash, ToyyibPay, CHIP, BillPlz. Kurier: EasyParcel, J&T, Pos Laju.'], ['Ada yuran transaksi?', 'Tiada yuran dari Lonjak. Anda hanya bayar caj pemprosesan gateway.'], ['Boleh guna domain sendiri?', 'Boleh. Hosting subdomain percuma, atau sambung domain sendiri.']] as [$q, $a])
+                    @foreach ([['Perlu pandai coding atau design?', 'Tak perlu langsung. Brief produk anda, AI jana salespage penuh.'], ['Gateway & kurier apa disokong?', 'Bayaran: BayarCash, ToyyibPay, CHIP, BillPlz. Kurier: EasyParcel, J&T, Pos Laju.'], ['Ada yuran transaksi?', 'Tiada yuran dari Mendap. Anda hanya bayar caj pemprosesan gateway.'], ['Boleh guna domain sendiri?', 'Boleh. Hosting subdomain percuma, atau sambung domain sendiri.']] as [$q, $a])
                         <details class="group px-5 py-4"><summary class="flex cursor-pointer list-none items-center justify-between text-sm font-medium text-ink marker:hidden">{{ $q }}<span class="ml-4 text-muted transition-transform group-open:rotate-45">+</span></summary><p class="mt-2 text-sm leading-relaxed text-ink-soft">{{ $a }}</p></details>
                     @endforeach
                 </div>
@@ -116,7 +116,7 @@
         {{-- CTA --}}
         <section class="mx-auto max-w-6xl px-4 py-20 sm:px-6">
             <div class="overflow-hidden rounded-[var(--radius-xl)] bg-primary px-8 py-14 text-center text-primary-fg">
-                <h2 class="mx-auto max-w-xl text-3xl font-bold tracking-tight text-balance">Mula jual hari ini dengan Lonjak</h2>
+                <h2 class="mx-auto max-w-xl text-3xl font-bold tracking-tight text-balance">Mula jual hari ini dengan Mendap</h2>
                 <p class="mx-auto mt-3 max-w-md text-primary-fg/85">Sertai ribuan usahawan Malaysia yang scale offer mereka dengan lebih pantas.</p>
                 <div class="mt-7 flex flex-wrap justify-center gap-3"><x-ui.button href="{{ route('register') }}" variant="secondary" size="lg" class="!text-ink">Langgan sekarang</x-ui.button></div>
             </div>
@@ -127,7 +127,7 @@
                 <div><x-logo /><p class="mt-2 max-w-xs text-sm text-muted">Platform salespage all-in-one untuk usahawan Malaysia.</p></div>
                 <div class="flex flex-wrap gap-x-8 gap-y-2 text-sm text-ink-soft"><a href="#platform" class="hover:text-primary">Platform</a><a href="#harga" class="hover:text-primary">Harga</a><a href="#soalan" class="hover:text-primary">Soalan</a></div>
             </div>
-            <div class="border-t border-border py-5 text-center text-xs text-muted">© {{ date('Y') }} Lonjak · ADFusion Marketing. Hak cipta terpelihara.</div>
+            <div class="border-t border-border py-5 text-center text-xs text-muted">© {{ date('Y') }} Mendap · ADFusion Marketing. Hak cipta terpelihara.</div>
         </footer>
     </div>
 </x-layouts.base>

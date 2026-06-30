@@ -15,7 +15,7 @@ class Mailer
 {
     public static function welcome(User $user): void
     {
-        self::send($user->email, $user->business_name ?? 'Usahawan', 'Selamat datang ke Lonjak 🎉', 'emails.welcome', ['user' => $user]);
+        self::send($user->email, $user->business_name ?? 'Usahawan', 'Selamat datang ke Mendap 🎉', 'emails.welcome', ['user' => $user]);
     }
 
     public static function orderReceived(Order $order): void

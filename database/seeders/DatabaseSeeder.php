@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
 
         $admin = User::create([
             'business_name' => 'Kedai Demo', 'name' => 'Admin Demo', 'phone' => '012-3456789',
-            'email' => 'admin@lonjak.my', 'password' => 'password',
+            'email' => 'admin@mendap.com', 'password' => 'password',
             'role' => 'admin', 'plan' => 'pro', 'ai_credits' => 3,
         ]);
 

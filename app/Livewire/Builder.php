@@ -118,6 +118,8 @@ class Builder extends Component
             'video_url' => $this->videoUrl,
         ]);
 
+        session()->flash('saved', true);
+
         return $this->redirectRoute('salespages.show', $sp, navigate: true);
     }
 

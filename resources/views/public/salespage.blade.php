@@ -1,7 +1,7 @@
-<x-layouts.base :title="$salespage->title">
+<x-layouts.base :title="$salespage->title" :force-light="true">
     @php $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); $price = (float) $salespage->price;
     $states = ['Selangor', 'Kuala Lumpur', 'Johor', 'Pulau Pinang', 'Perak', 'Kedah', 'Kelantan', 'Terengganu', 'Pahang', 'Melaka', 'Negeri Sembilan', 'Perlis', 'Sabah', 'Sarawak', 'Putrajaya', 'Labuan']; @endphp
-    <div class="min-h-screen bg-muted-surface/40 py-6">
+    <div class="min-h-screen bg-muted-surface/40 pb-28 pt-6">
         <div class="mx-auto max-w-md overflow-hidden rounded-[var(--radius-xl)] border border-border bg-bg elev-2">
             @include('partials.salespage', ['page' => $page])
 
@@ -46,4 +46,19 @@
         </div>
         <div class="mx-auto mt-4 flex max-w-md items-center justify-center gap-1.5 text-xs text-muted">Dikuasakan oleh <x-logo class="scale-90" /></div>
     </div>
+
+    {{-- Sticky mobile buy bar --}}
+    @if (! session('ordered'))
+        <div x-data="{ show: false }" x-init="window.addEventListener('scroll', () => show = window.scrollY > 420)"
+             x-show="show" x-transition.opacity x-cloak
+             class="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-bg/95 px-4 py-3 shadow-[0_-2px_16px_rgba(0,0,0,0.08)] backdrop-blur-sm">
+            <div class="mx-auto flex max-w-md items-center gap-3">
+                <div class="leading-tight">
+                    <p class="text-[0.7rem] text-muted">Harga</p>
+                    <p class="text-lg font-extrabold text-primary tnum">RM{{ number_format($price, 2) }}</p>
+                </div>
+                <a href="#checkout" class="flex flex-1 items-center justify-center gap-2 rounded-full bg-primary px-5 py-3.5 text-sm font-bold text-primary-fg shadow-lg shadow-primary/25 active:scale-[0.98]">Beli Sekarang <x-lucide-arrow-right class="size-4" /></a>
+            </div>
+        </div>
+    @endif
 </x-layouts.base>

@@ -69,6 +69,7 @@
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Realiti</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
                     @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[40ch] text-center text-sm leading-relaxed text-ink-soft">{{ $b['body'] }}</p>@endif
+                    @if (count($images) > 1)<div class="mx-auto mt-6 max-w-md overflow-hidden rounded-[var(--radius-xl)] shadow-lg ring-1 ring-black/5"><img src="{{ $images[1] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3">
                             @foreach ($b['bullets'] as $i => $bl)
@@ -95,7 +96,7 @@
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Penyelesaiannya</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
                     <p class="mx-auto mt-3 max-w-[40ch] text-center text-sm leading-relaxed text-ink-soft">{{ $b['body'] ?? '' }}</p>
-                    @if (count($images) > 1)<div class="mx-auto mt-5 max-w-[320px] overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $images[1] }}" alt="" class="w-full object-cover"></div>@endif
+                    @if (count($images) > 2)<div class="mx-auto mt-5 max-w-[320px] overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $images[2] }}" alt="" class="w-full object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <ul class="mx-auto mt-5 grid max-w-md gap-2.5">
                             @foreach ($b['bullets'] as $bl)
@@ -202,8 +203,8 @@
         @endswitch
     @endforeach
 
-    @if (count($images) > 2)
-        <div class="scroll-thin flex gap-2.5 overflow-x-auto px-6 py-4">@foreach (array_slice($images, 2) as $img)<img src="{{ $img }}" class="size-24 shrink-0 rounded-[var(--radius-lg)] border border-border object-cover" alt="">@endforeach</div>
+    @if (count($images) > 3)
+        <div class="scroll-thin flex gap-2.5 overflow-x-auto px-6 py-4">@foreach (array_slice($images, 3) as $img)<img src="{{ $img }}" class="size-24 shrink-0 rounded-[var(--radius-lg)] border border-border object-cover" alt="">@endforeach</div>
     @endif
 
     <footer class="border-t border-border px-6 py-6 text-center">

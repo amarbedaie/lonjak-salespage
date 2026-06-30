@@ -2,6 +2,20 @@
     $blocks = $page['blocks'] ?? [];
     $images = array_values(array_filter($page['images'] ?? []));
     $video = $page['video'] ?? null;
+    $gallery = $page['gallery'] ?? null;
+    $videoBlock = $page['video_block'] ?? 'hero';
+    // If media wasn't AI-directed (no block carries an image), fall back to basic placement.
+    if (! collect($blocks)->contains(fn ($b) => ! empty($b['image'])) && $images) {
+        $map = ['hero' => 0, 'problem' => 1, 'solution' => 2];
+        foreach ($blocks as $i => $b) {
+            $t = $b['type'] ?? '';
+            if (isset($map[$t], $images[$map[$t]])) {
+                $blocks[$i]['image'] = $images[$map[$t]];
+            }
+        }
+        $gallery = array_slice($images, 3);
+    }
+    $gallery = $gallery ?: [];
     $rm = fn ($n) => 'RM' . number_format((float) $n, 2);
 
     // Visual theme (color scheme) — picked per salespage.
@@ -44,8 +58,8 @@
                     <span class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold uppercase tracking-wide ring-1 {{ $T['badge'] }}">✦ Tawaran istimewa hari ini</span>
                     <h1 class="font-display mx-auto mt-5 max-w-[15ch] text-[2.15rem] font-black leading-[1.05] tracking-tight text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
                     <p class="mx-auto mt-4 max-w-[34ch] text-[0.95rem] leading-relaxed {{ $T['heroSub'] }}">{{ $b['body'] ?? '' }}</p>
-                    @if (! empty($images))
-                        <div class="mx-auto mt-7 max-w-[300px] overflow-hidden rounded-[20px] shadow-2xl ring-1 ring-black/10"><img src="{{ $images[0] }}" alt="" class="aspect-square w-full bg-muted-surface object-cover"></div>
+                    @if (! empty($b['image']))
+                        <div class="mx-auto mt-7 max-w-[300px] overflow-hidden rounded-[20px] shadow-2xl ring-1 ring-black/10"><img src="{{ $b['image'] }}" alt="" class="aspect-square w-full bg-muted-surface object-cover"></div>
                     @endif
                     @if (! empty($b['bullets']))
                         <ul class="mx-auto mt-6 flex max-w-xs flex-col gap-2 text-left">
@@ -60,8 +74,6 @@
                         <span class="text-xs font-medium {{ $T['heroSub'] }}">{{ $b['meta']['customers'] ?? '2,000+' }} pelanggan berpuas hati</span>
                     </div>
                 </section>
-                @if ($embed)<div class="aspect-video w-full bg-black"><iframe src="{{ $embed }}" class="size-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
-                @elseif ($video)<video src="{{ $video }}" controls class="aspect-video w-full bg-black object-contain"></video>@endif
                 @break
 
             @case('problem')
@@ -69,7 +81,7 @@
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Realiti</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
                     @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[40ch] text-center text-sm leading-relaxed text-ink-soft">{{ $b['body'] }}</p>@endif
-                    @if (count($images) > 1)<div class="mx-auto mt-6 max-w-md overflow-hidden rounded-[var(--radius-xl)] shadow-lg ring-1 ring-black/5"><img src="{{ $images[1] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
+                    @if (! empty($b['image']))<div class="mx-auto mt-6 max-w-md overflow-hidden rounded-[var(--radius-xl)] shadow-lg ring-1 ring-black/5"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3">
                             @foreach ($b['bullets'] as $i => $bl)
@@ -96,7 +108,7 @@
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Penyelesaiannya</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
                     <p class="mx-auto mt-3 max-w-[40ch] text-center text-sm leading-relaxed text-ink-soft">{{ $b['body'] ?? '' }}</p>
-                    @if (count($images) > 2)<div class="mx-auto mt-5 max-w-[320px] overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $images[2] }}" alt="" class="w-full object-cover"></div>@endif
+                    @if (! empty($b['image']))<div class="mx-auto mt-5 max-w-[320px] overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $b['image'] }}" alt="" class="w-full object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <ul class="mx-auto mt-5 grid max-w-md gap-2.5">
                             @foreach ($b['bullets'] as $bl)
@@ -201,10 +213,14 @@
                 <section class="px-6 pb-8 pt-5"><div class="mx-auto max-w-md rounded-[var(--radius-md)] border-l-[3px] border-primary bg-muted-surface/60 px-4 py-3.5"><p class="text-sm italic leading-relaxed text-ink-soft">{{ $b['body'] ?? '' }}</p></div></section>
                 @break
         @endswitch
+        @if ($video && $type === $videoBlock)
+            @if ($embed)<div class="aspect-video w-full bg-black"><iframe src="{{ $embed }}" class="size-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+            @elseif ($video)<video src="{{ $video }}" controls class="aspect-video w-full bg-black object-contain"></video>@endif
+        @endif
     @endforeach
 
-    @if (count($images) > 3)
-        <div class="scroll-thin flex gap-2.5 overflow-x-auto px-6 py-4">@foreach (array_slice($images, 3) as $img)<img src="{{ $img }}" class="size-24 shrink-0 rounded-[var(--radius-lg)] border border-border object-cover" alt="">@endforeach</div>
+    @if (count($gallery))
+        <div class="scroll-thin flex gap-2.5 overflow-x-auto px-6 py-4">@foreach ($gallery as $img)<img src="{{ $img }}" class="size-24 shrink-0 rounded-[var(--radius-lg)] border border-border object-cover" alt="">@endforeach</div>
     @endif
 
     <footer class="border-t border-border px-6 py-6 text-center">

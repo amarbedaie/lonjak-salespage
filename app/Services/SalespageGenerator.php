@@ -212,6 +212,129 @@ TXT;
         return [self::normalizeBlocks($this->mock($brief))];
     }
 
+    /**
+     * AI "media director" — looks at the merchant's images + the salespage story and
+     * decides the genius placement (which image in which block, where the video goes,
+     * whether an AI poster is still needed). Thinks like a senior DR marketer.
+     * Returns the page with per-block 'image' set, plus 'video_block', 'gallery', 'need_poster'.
+     */
+    public function directMedia(array $page, array $imagePaths, ?string $video = null): array
+    {
+        $blocks = $page['blocks'] ?? [];
+        $urls = array_map(fn ($p) => asset('storage/' . $p), $imagePaths);
+
+        // No images & no video → maybe a poster is needed for the hero.
+        if (empty($imagePaths)) {
+            $page['video_block'] = $video ? 'hero' : null;
+            $page['gallery'] = [];
+            $page['need_poster'] = true;
+
+            return $page;
+        }
+
+        $plan = null;
+        if ($key = config('services.openrouter.key')) {
+            $plan = $this->planMediaWithVision($blocks, $imagePaths, $video, $key);
+        }
+
+        if (! $plan) {
+            return $this->basicMediaPlacement($page, $urls, $video);
+        }
+
+        // Apply the AI plan: assign each image to the first matching block.
+        $assign = is_array($plan['assign'] ?? null) ? $plan['assign'] : [];
+        $used = [];
+        foreach ($assign as $idx => $blockType) {
+            $idx = (int) $idx;
+            if (! isset($urls[$idx])) {
+                continue;
+            }
+            foreach ($blocks as $i => $b) {
+                if (($b['type'] ?? '') === $blockType && empty($blocks[$i]['image'])) {
+                    $blocks[$i]['image'] = $urls[$idx];
+                    $used[$idx] = true;
+                    break;
+                }
+            }
+        }
+
+        $page['blocks'] = $blocks;
+        $page['video_block'] = $plan['video_block'] ?? ($video ? 'hero' : null);
+        $page['gallery'] = array_values(array_filter($urls, fn ($u, $i) => ! isset($used[$i]), ARRAY_FILTER_USE_BOTH));
+        // Need a poster only if nothing was placed in the hero.
+        $heroHasImage = collect($blocks)->first(fn ($b) => ($b['type'] ?? '') === 'hero' && ! empty($b['image']));
+        $page['need_poster'] = ! $heroHasImage && (bool) ($plan['need_poster'] ?? false);
+
+        return $page;
+    }
+
+    private function planMediaWithVision(array $blocks, array $imagePaths, ?string $video, string $key): ?array
+    {
+        try {
+            $summary = collect($blocks)
+                ->map(fn ($b) => '- ' . ($b['type'] ?? '') . ': ' . \Illuminate\Support\Str::limit($b['headline'] ?? ($b['body'] ?? ''), 70))
+                ->implode("\n");
+            $instruction = "Anda pengarah kreatif & marketer direct-response SENIOR (fikir macam Alex Hormozi — apa yang CONVERT). "
+                . "Salespage ini ada blok berikut (ikut urutan):\n{$summary}\n\n"
+                . 'Di bawah ada ' . count($imagePaths) . ' gambar (Gambar #0, #1, ...)' . ($video ? ' dan ada 1 video' : '') . ". "
+                . 'Tengok SETIAP gambar, faham apa ia, dan tugaskan ke blok PALING SESUAI untuk menjual: '
+                . 'gambar produk/mockup → hero atau offer; gambar emosi/lifestyle/orang → problem atau agitate; '
+                . 'gambar produk digunakan/demo → solution; screenshot bukti/testimoni → proof. '
+                . 'Satu gambar satu blok. Kalau gambar tak sesuai untuk hero & tiada mockup produk, set need_poster=true. '
+                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false}. '
+                . 'Jenis blok sah: hero, problem, agitate, solution, offer, bonus, proof, guarantee, urgency, faq, cta, ps.';
+
+            $parts = [['type' => 'text', 'text' => $instruction]];
+            foreach ($imagePaths as $i => $path) {
+                $bytes = \Illuminate\Support\Facades\Storage::disk('public')->get($path);
+                if (! $bytes) {
+                    continue;
+                }
+                $parts[] = ['type' => 'text', 'text' => "Gambar #{$i}:"];
+                $parts[] = ['type' => 'image_url', 'image_url' => ['url' => 'data:image/png;base64,' . base64_encode($bytes)]];
+            }
+
+            $res = Http::withToken($key)->timeout(90)->post('https://openrouter.ai/api/v1/chat/completions', [
+                'model' => 'google/gemini-2.5-flash',
+                'max_tokens' => 800,
+                'response_format' => ['type' => 'json_object'],
+                'messages' => [['role' => 'user', 'content' => $parts]],
+            ]);
+            $data = json_decode($this->extractJson($res->json('choices.0.message.content') ?? '{}'), true);
+
+            return is_array($data) ? $data : null;
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    /** Fallback placement when AI is unavailable: hero, problem, solution, then gallery. */
+    private function basicMediaPlacement(array $page, array $urls, ?string $video): array
+    {
+        $order = ['hero', 'problem', 'solution'];
+        $blocks = $page['blocks'] ?? [];
+        $u = 0;
+        foreach ($order as $type) {
+            if (! isset($urls[$u])) {
+                break;
+            }
+            foreach ($blocks as $i => $b) {
+                if (($b['type'] ?? '') === $type) {
+                    $blocks[$i]['image'] = $urls[$u++];
+                    break;
+                }
+            }
+        }
+        $page['blocks'] = $blocks;
+        $page['video_block'] = $video ? 'hero' : null;
+        $page['gallery'] = array_values(array_slice($urls, $u));
+        $page['need_poster'] = empty($urls);
+
+        return $page;
+    }
+
     /** Generate an AI product poster image; returns a stored public-disk path or null. */
     public function generatePoster(array $brief): ?string
     {

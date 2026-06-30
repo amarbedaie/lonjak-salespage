@@ -136,37 +136,68 @@ class Builder extends Component
         }
     }
 
-    /** Auto-fired after variants render — AI poster ONLY if merchant has no real product image (smart). */
-    public function makePoster(SalespageGenerator $gen): void
+    /** Auto-fired after variants render — AI media director places media + adds a poster if needed. */
+    public function arrangeMedia(SalespageGenerator $gen): void
     {
-        if ($this->posterDone || ! empty($this->images)) {
-            $this->posterDone = true;
-
+        if ($this->posterDone) {
             return;
         }
-        $this->genPoster($gen);
+        $this->posterDone = true;
+        $this->page = $this->directAndPoster($this->page, $gen);
+        $this->variants[$this->selectedVariant] = $this->page;
     }
 
-    /** Manual button — force an AI poster even when product images already exist. */
+    public function selectVariant(SalespageGenerator $gen, int $i): void
+    {
+        if (! isset($this->variants[$i])) {
+            return;
+        }
+        $this->selectedVariant = $i;
+        $page = $this->variants[$i];
+        if (! collect($page['blocks'] ?? [])->contains(fn ($b) => ! empty($b['image']))) {
+            $page = $this->directAndPoster($page, $gen);
+            $this->variants[$i] = $page;
+        }
+        $this->page = $page;
+    }
+
+    /** Manual button — generate a fresh AI poster for the hero. */
     public function forcePoster(SalespageGenerator $gen): void
     {
-        $this->genPoster($gen);
-    }
-
-    private function genPoster(SalespageGenerator $gen): void
-    {
-        $this->posterDone = true;
         if ($poster = $gen->generatePoster(['name' => $this->name, 'category' => $this->category, 'audience' => $this->audience])) {
             array_unshift($this->images, $poster);
+            $this->page = $this->setHeroImage($this->page, asset('storage/' . $poster));
+            $this->variants[$this->selectedVariant] = $this->page;
         }
     }
 
-    public function selectVariant(int $i): void
+    /** Run the AI media director, then auto-generate a poster for the hero if still needed. */
+    private function directAndPoster(array $page, SalespageGenerator $gen): array
     {
-        if (isset($this->variants[$i])) {
-            $this->selectedVariant = $i;
-            $this->page = $this->variants[$i];
+        $directed = $gen->directMedia($page, $this->images, $this->videoUrl);
+        if (! empty($directed['need_poster'])) {
+            if ($poster = $gen->generatePoster(['name' => $this->name, 'category' => $this->category, 'audience' => $this->audience])) {
+                array_unshift($this->images, $poster);
+                $directed = $this->setHeroImage($directed, asset('storage/' . $poster));
+                $directed['need_poster'] = false;
+            }
         }
+
+        return $directed;
+    }
+
+    private function setHeroImage(array $page, string $url): array
+    {
+        $blocks = $page['blocks'] ?? [];
+        foreach ($blocks as $i => $b) {
+            if (($b['type'] ?? '') === 'hero') {
+                $blocks[$i]['image'] = $url;
+                break;
+            }
+        }
+        $page['blocks'] = $blocks;
+
+        return $page;
     }
 
     public function publish()

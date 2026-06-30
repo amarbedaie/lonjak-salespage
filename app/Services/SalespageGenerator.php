@@ -53,6 +53,53 @@ TXT;
         return ['page' => self::normalizeBlocks($this->mock($brief)), 'source' => 'mock'];
     }
 
+    /**
+     * Extract a structured brief from a free-form (typed or voiced) product
+     * description. Returns keys: name, price, comparePrice, category, audience,
+     * problem, benefits, tone — any may be null if not inferable.
+     */
+    public function extractBrief(string $description): array
+    {
+        $empty = ['name' => null, 'price' => null, 'comparePrice' => null, 'category' => null, 'audience' => null, 'problem' => null, 'benefits' => null, 'tone' => null];
+        if (! ($key = config('services.openrouter.key'))) {
+            return $empty;
+        }
+        try {
+            $system = 'Anda pembantu yang ekstrak butiran produk daripada penerangan pengguna (Bahasa Melayu). '
+                . 'PULANGKAN HANYA satu objek JSON sah dengan kunci: name (nama produk), price (nombor RM jualan), '
+                . 'comparePrice (nombor RM harga asal/coret atau null), category, audience (target pelanggan), '
+                . 'problem (masalah diselesaikan), benefits (kelebihan, pisah koma), tone (santai|profesional|agresif). '
+                . 'Teka nilai munasabah jika tak dinyatakan. Jangan reka harga jika tiada — letak null.';
+            $res = Http::withToken($key)
+                ->timeout(60)
+                ->post('https://openrouter.ai/api/v1/chat/completions', [
+                    'model' => config('services.openrouter.model', 'anthropic/claude-haiku-4.5'),
+                    'max_tokens' => 1200,
+                    'response_format' => ['type' => 'json_object'],
+                    'messages' => [
+                        ['role' => 'system', 'content' => $system],
+                        ['role' => 'user', 'content' => $description],
+                    ],
+                ]);
+            $data = json_decode($this->extractJson($res->json('choices.0.message.content') ?? '{}'), true) ?: [];
+
+            return [
+                'name' => $data['name'] ?? null,
+                'price' => isset($data['price']) && is_numeric($data['price']) ? (float) $data['price'] : null,
+                'comparePrice' => isset($data['comparePrice']) && is_numeric($data['comparePrice']) ? (float) $data['comparePrice'] : null,
+                'category' => $data['category'] ?? null,
+                'audience' => $data['audience'] ?? null,
+                'problem' => $data['problem'] ?? null,
+                'benefits' => $data['benefits'] ?? null,
+                'tone' => in_array($data['tone'] ?? '', ['santai', 'profesional', 'agresif'], true) ? $data['tone'] : null,
+            ];
+        } catch (Throwable $e) {
+            report($e);
+
+            return $empty;
+        }
+    }
+
     private function viaOpenRouter(array $brief, string $key): array
     {
         $model = config('services.openrouter.model', 'anthropic/claude-3.5-haiku');

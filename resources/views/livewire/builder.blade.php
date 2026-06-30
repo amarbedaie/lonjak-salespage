@@ -52,6 +52,36 @@
     </div>
 
     @if ($stage === 'brief')
+        <x-ui.card class="mb-6 border-primary/30 bg-gradient-to-b from-primary-soft/40 to-surface" x-data="{
+            listening: false, supported: true, rec: null,
+            init() {
+                var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                if (!SR) { this.supported = false; return; }
+                this.rec = new SR(); this.rec.lang = 'ms-MY'; this.rec.continuous = true; this.rec.interimResults = false;
+                var self = this;
+                this.rec.onresult = function(e) { var txt=''; for (var i=e.resultIndex;i<e.results.length;i++) txt+=e.results[i][0].transcript+' '; var ta=self.$refs.ta; ta.value=(ta.value?ta.value.trim()+' ':'')+txt.trim(); ta.dispatchEvent(new Event('input')); };
+                this.rec.onend = function(){ self.listening=false; }; this.rec.onerror = function(){ self.listening=false; };
+            },
+            toggle() { if (!this.supported) return; if (this.listening){ this.rec.stop(); this.listening=false; } else { try{ this.rec.start(); this.listening=true; }catch(e){} } }
+        }">
+            <x-ui.card-header title="✦ Cara pantas — terangkan je" subtitle="Taip atau tekan 🎤 untuk cakap. AI isikan brief di bawah untuk anda." />
+            <x-ui.card-body class="space-y-3">
+                <div class="relative">
+                    <textarea wire:model="description" x-ref="ta" rows="4" placeholder="cth: Saya jual Serum Glow untuk wanita 25–40 yang kulit kusam & jeragat. Harga RM89, biasa RM159. Bahan semula jadi, nampak hasil 7 hari..." class="w-full rounded-[var(--radius-md)] border border-border bg-bg px-3.5 py-3 pr-16 text-sm text-ink placeholder:text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"></textarea>
+                    <button type="button" @click="toggle()" :class="listening ? 'bg-danger text-white animate-pulse' : 'bg-primary text-primary-fg'" class="absolute bottom-3 right-3 flex size-10 items-center justify-center rounded-full shadow-md transition" :title="listening ? 'Berhenti' : 'Cakap'">
+                        <svg x-show="!listening" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="size-5"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                        <svg x-show="listening" x-cloak viewBox="0 0 24 24" fill="currentColor" class="size-4"><rect x="5" y="5" width="14" height="14" rx="3"/></svg>
+                    </button>
+                </div>
+                <p x-show="listening" x-cloak class="flex items-center gap-1.5 text-xs font-medium text-danger"><span class="size-2 animate-pulse rounded-full bg-danger"></span> Mendengar… cakap sekarang (tekan butang merah untuk berhenti)</p>
+                <p x-show="!supported" x-cloak class="text-xs text-muted">🎤 Voice tak disokong browser ni — sila taip (guna Chrome/Safari untuk voice).</p>
+                @error('description')<p class="text-xs text-danger">{{ $message }}</p>@enderror
+                <x-ui.button wire:click="fillFromDescription" wire:loading.attr="disabled" wire:target="fillFromDescription">
+                    <span wire:loading.remove wire:target="fillFromDescription" class="flex items-center gap-2"><x-lucide-sparkles class="size-4" /> Tulis brief untuk saya</span>
+                    <span wire:loading wire:target="fillFromDescription" class="flex items-center gap-2"><x-lucide-loader-circle class="size-4 animate-spin" /> AI sedang baca…</span>
+                </x-ui.button>
+            </x-ui.card-body>
+        </x-ui.card>
         <div class="grid gap-6 lg:grid-cols-5">
             <x-ui.card class="lg:col-span-3">
                 <x-ui.card-header title="Brief produk" subtitle="Lagi lengkap brief, lagi tajam copy yang AI jana." />

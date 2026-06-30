@@ -33,6 +33,7 @@ class Builder extends Component
     public array $images = [];        // stored image paths
     public string $videoUrl = '';
     public $newImages = [];           // temp uploads (Livewire)
+    public string $description = '';  // free-form / voiced product description
 
     /** Pre-fill the brief from a saved product (Pustaka Produk → Jana Salespage). */
     public function mount(): void
@@ -69,6 +70,36 @@ class Builder extends Component
     {
         unset($this->images[$i]);
         $this->images = array_values($this->images);
+    }
+
+    /** "Terangkan je" — AI fills the brief fields from a free-form/voiced description. */
+    public function fillFromDescription(SalespageGenerator $gen): void
+    {
+        $desc = trim($this->description);
+        if (mb_strlen($desc) < 10) {
+            $this->addError('description', 'Terangkan produk anda sedikit lagi (taip atau tekan 🎤).');
+
+            return;
+        }
+        $b = $gen->extractBrief($desc);
+        foreach (['name', 'audience', 'problem', 'benefits'] as $k) {
+            if (! empty($b[$k])) {
+                $this->$k = $b[$k];
+            }
+        }
+        if ($b['price'] !== null) {
+            $this->price = $b['price'];
+        }
+        if ($b['comparePrice'] !== null) {
+            $this->comparePrice = $b['comparePrice'];
+        }
+        if (! empty($b['tone'])) {
+            $this->tone = $b['tone'];
+        }
+        if (! empty($b['category'])) {
+            $cats = ['Kecantikan', 'Kesihatan', 'Fesyen', 'Makanan', 'Gadget', 'Rumah', 'Lain-lain'];
+            $this->category = in_array($b['category'], $cats, true) ? $b['category'] : 'Lain-lain';
+        }
     }
 
     public function generate(SalespageGenerator $gen): void

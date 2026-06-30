@@ -28,6 +28,9 @@ class Builder extends Component
     public string $stage = 'brief';   // brief | result
     public string $source = 'mock';
     public array $page = [];
+    public array $variants = [];      // multiple generated variants
+    public int $selectedVariant = 0;
+    public bool $posterDone = false;
     public ?int $productId = null;
 
     public array $images = [];        // stored image paths
@@ -112,19 +115,44 @@ class Builder extends Component
             'name' => 'nama produk', 'price' => 'harga', 'audience' => 'audiens',
         ]);
 
-        $result = $gen->generate([
+        $brief = [
             'name' => $this->name, 'price' => $this->price, 'comparePrice' => $this->comparePrice,
             'category' => $this->category, 'audience' => $this->audience,
             'problem' => $this->problem, 'benefits' => $this->benefits, 'tone' => $this->tone,
-        ]);
+        ];
 
-        $this->page = $result['page'];
-        $this->source = $result['source'];
+        // 3 variants (different angles), in parallel.
+        $this->variants = $gen->generateVariants($brief, 3);
+        $this->selectedVariant = 0;
+        $this->page = $this->variants[0] ?? [];
+        $this->source = config('services.openrouter.key') ? 'openrouter' : 'mock';
+
+        $this->posterDone = false;
         $this->stage = 'result';
 
         $user = auth()->user();
         if ($user->ai_credits > 0) {
             $user->decrement('ai_credits');
+        }
+    }
+
+    /** Auto-fired after variants render — generate the AI poster separately (keeps generate() fast). */
+    public function makePoster(SalespageGenerator $gen): void
+    {
+        if ($this->posterDone) {
+            return;
+        }
+        $this->posterDone = true;
+        if ($poster = $gen->generatePoster(['name' => $this->name, 'category' => $this->category])) {
+            array_unshift($this->images, $poster);
+        }
+    }
+
+    public function selectVariant(int $i): void
+    {
+        if (isset($this->variants[$i])) {
+            $this->selectedVariant = $i;
+            $this->page = $this->variants[$i];
         }
     }
 

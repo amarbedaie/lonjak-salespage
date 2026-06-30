@@ -54,6 +54,11 @@ Route::middleware(['auth', 'not.suspended'])->prefix('dashboard')->group(functio
     Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
     Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
+    Route::get('/coupons', [\App\Http\Controllers\CouponController::class, 'index'])->name('coupons.index');
+    Route::post('/coupons', [\App\Http\Controllers\CouponController::class, 'store'])->name('coupons.store');
+    Route::post('/coupons/{coupon}/toggle', [\App\Http\Controllers\CouponController::class, 'toggle'])->name('coupons.toggle');
+    Route::delete('/coupons/{coupon}', [\App\Http\Controllers\CouponController::class, 'destroy'])->name('coupons.destroy');
+
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/payments', [\App\Http\Controllers\PaymentSettingsController::class, 'index'])->name('payments');
     Route::post('/payments', [\App\Http\Controllers\PaymentSettingsController::class, 'update'])->name('payments.update');

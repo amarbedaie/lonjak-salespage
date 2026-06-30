@@ -102,14 +102,8 @@ TXT;
 
     private function viaOpenRouter(array $brief, string $key): array
     {
-        $model = config('services.openrouter.model', 'anthropic/claude-3.5-haiku');
-        $system = self::FRAMEWORK
-            . "\n\nPULANGKAN HANYA satu objek JSON sah: {\"blocks\": [ ... ]}. "
-            . "Setiap blok MESTI guna kunci ARAS ATAS ini secara LANGSUNG — JANGAN sarang dalam objek lain (cth JANGAN guna \"kandungan\"): "
-            . "type (salah satu: " . implode(', ', array_keys(self::BLOCK_LABELS)) . "), label, headline, body, "
-            . "bullets (array string), items (array objek {q,a} untuk proof & faq), meta ({price, compare} nombor untuk offer & cta). "
-            . "Guna nama kunci TEPAT ini sahaja — JANGAN guna subheadline/subtitle/cta_text/description. "
-            . "Contoh satu blok: {\"type\":\"hero\",\"label\":\"Hero\",\"headline\":\"Tajuk utama\",\"body\":\"Ayat sokongan\",\"bullets\":[\"poin 1\",\"poin 2\"]}";
+        $model = config('services.openrouter.model', 'anthropic/claude-haiku-4.5');
+        $system = $this->systemPrompt();
 
         $res = Http::withToken($key)
             ->withHeaders(['HTTP-Referer' => config('app.url'), 'X-Title' => 'Mendap'])
@@ -152,6 +146,104 @@ TXT;
             'Kelebihan / selling point: ' . ($brief['benefits'] ?? ''),
             'Tona: ' . ($brief['tone'] ?? 'santai'),
         ])->filter()->implode("\n");
+    }
+
+    private function systemPrompt(): string
+    {
+        return self::FRAMEWORK
+            . "\n\nPULANGKAN HANYA satu objek JSON sah: {\"blocks\": [ ... ]}. "
+            . 'Setiap blok MESTI guna kunci ARAS ATAS ini secara LANGSUNG — JANGAN sarang dalam objek lain (cth JANGAN guna "kandungan"): '
+            . 'type (salah satu: ' . implode(', ', array_keys(self::BLOCK_LABELS)) . '), label, headline, body, '
+            . 'bullets (array string), items (array objek {q,a} untuk proof & faq), meta ({price, compare} nombor untuk offer & cta). '
+            . 'Guna nama kunci TEPAT ini sahaja — JANGAN guna subheadline/subtitle/cta_text/description. '
+            . 'Contoh: {"type":"hero","label":"Hero","headline":"Tajuk utama","body":"Ayat sokongan","bullets":["poin 1","poin 2"]}';
+    }
+
+    /** Generate N salespage variants in parallel, each led by a different angle. */
+    public function generateVariants(array $brief, int $count = 3): array
+    {
+        $angles = [
+            'EMOSI & CERITA: pimpin dengan kesakitan emosi terdalam + sentuhan peribadi/spiritual.',
+            'NILAI & OFFER: pimpin dengan offer stack & bukti berbaloi — apa pembeli dapat, kenapa worth it.',
+            'URGENCY & BUKTI SOSIAL: pimpin dengan scarcity jujur, testimoni kuat & FOMO.',
+        ];
+        $angles = array_slice($angles, 0, max(1, $count));
+
+        if (! ($key = config('services.openrouter.key'))) {
+            return array_map(fn () => self::normalizeBlocks($this->mock($brief)), $angles);
+        }
+
+        try {
+            $model = config('services.openrouter.model', 'anthropic/claude-haiku-4.5');
+            $sys = $this->systemPrompt();
+            $userPrompt = $this->prompt($brief);
+            $responses = Http::pool(fn ($pool) => array_map(
+                fn ($angle) => $pool->withToken($key)->withHeaders(['X-Title' => 'Mendap'])->timeout(120)
+                    ->post('https://openrouter.ai/api/v1/chat/completions', [
+                        'model' => $model,
+                        'max_tokens' => 8000,
+                        'response_format' => ['type' => 'json_object'],
+                        'messages' => [
+                            ['role' => 'system', 'content' => $sys . "\n\nSUDUT VARIASI INI — " . $angle],
+                            ['role' => 'user', 'content' => $userPrompt],
+                        ],
+                    ]),
+                $angles
+            ));
+
+            $out = [];
+            foreach ($responses as $res) {
+                try {
+                    $data = json_decode($this->extractJson($res->json('choices.0.message.content') ?? '{}'), true);
+                    if (isset($data['blocks']) && is_array($data['blocks'])) {
+                        $out[] = self::normalizeBlocks($data);
+                    }
+                } catch (Throwable $e) {
+                    // skip a failed variant
+                }
+            }
+            if ($out) {
+                return $out;
+            }
+        } catch (Throwable $e) {
+            report($e);
+        }
+
+        return [self::normalizeBlocks($this->mock($brief))];
+    }
+
+    /** Generate an AI product poster image; returns a stored public-disk path or null. */
+    public function generatePoster(array $brief): ?string
+    {
+        if (! ($key = config('services.openrouter.key'))) {
+            return null;
+        }
+        try {
+            $name = $brief['name'] ?? 'produk';
+            $cat = $brief['category'] ?? '';
+            $prompt = "Cipta satu poster produk e-commerce premium & menarik untuk salespage Malaysia: \"{$name}\""
+                . ($cat ? " (kategori {$cat})" : '') . '. Mockup produk realistik, pencahayaan studio, latar gradien lembut kemas, '
+                . 'komposisi tengah, gaya iklan Facebook/Instagram convert tinggi. JANGAN letak sebarang teks/perkataan dalam gambar. Format menegak.';
+            $res = Http::withToken($key)->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
+                'model' => 'google/gemini-2.5-flash-image',
+                'modalities' => ['image', 'text'],
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+            ]);
+            $url = data_get($res->json(), 'choices.0.message.images.0.image_url.url');
+            if (! is_string($url) || ! str_starts_with($url, 'data:image')) {
+                return null;
+            }
+            [$meta, $b64] = explode(',', $url, 2);
+            $ext = str_contains($meta, 'jpeg') || str_contains($meta, 'jpg') ? 'jpg' : 'png';
+            $path = 'posters/' . (auth()->id() ?: 'x') . '/' . \Illuminate\Support\Str::random(24) . '.' . $ext;
+            \Illuminate\Support\Facades\Storage::disk('public')->put($path, base64_decode($b64));
+
+            return $path;
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
     }
 
     private function extractJson(string $text): string

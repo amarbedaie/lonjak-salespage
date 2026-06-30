@@ -1,14 +1,14 @@
 <div class="space-y-6" x-data="{
     genPct: 0, genStep: 0,
-    genSteps: ['Menganalisa produk & audiens', 'Membina hook & headline', 'Menyusun offer & bukti sosial', 'Menyiapkan jaminan & urgency', 'Menyiapkan FAQ & CTA'],
+    genSteps: ['Variasi 1 — Emosi & Cerita', 'Variasi 2 — Nilai & Offer', 'Variasi 3 — Urgency & Bukti', 'Menjana poster AI', 'Memuktamadkan reka letak'],
     genTimer: null,
     genBegin() {
         this.genPct = 0; this.genStep = 0;
         clearInterval(this.genTimer);
         this.genTimer = setInterval(() => {
-            if (this.genPct < 93) this.genPct += Math.max(1, Math.round((93 - this.genPct) / 26));
-            this.genStep = Math.min(this.genSteps.length - 1, Math.floor(this.genPct / (94 / this.genSteps.length)));
-        }, 240);
+            if (this.genPct < 94) this.genPct += Math.max(1, Math.round((94 - this.genPct) / 42));
+            this.genStep = Math.min(this.genSteps.length - 1, Math.floor(this.genPct / (95 / this.genSteps.length)));
+        }, 380);
     },
 }">
     <div class="flex items-center gap-3">
@@ -33,8 +33,8 @@
                     </svg>
                     <span class="absolute text-base font-bold text-primary tnum" x-text="genPct + '%'"></span>
                 </div>
-                <h2 class="mt-5 text-lg font-semibold text-ink">AI sedang menulis salespage anda…</h2>
-                <p class="mt-1 text-sm text-muted">Biasanya ambil 10–20 saat.</p>
+                <h2 class="mt-5 text-lg font-semibold text-ink">AI sedang jana 3 variasi salespage…</h2>
+                <p class="mt-1 text-sm text-muted">3 sudut berbeza + poster AI · biasanya 20–40 saat.</p>
                 <ul class="mx-auto mt-6 max-w-sm space-y-2.5 text-left text-sm">
                     <template x-for="(s, i) in genSteps" :key="i">
                         <li class="flex items-center gap-3 transition-colors" :class="i < genStep ? 'text-success font-medium' : (i === genStep ? 'text-ink' : 'text-muted/50')">
@@ -178,10 +178,23 @@
             </div>
         </div>
     @else
+        @if (count($variants) > 1)
+            @php $vlabels = ['Emosi & Cerita', 'Nilai & Offer', 'Urgency & Bukti']; @endphp
+            <div class="mb-6 rounded-[var(--radius-lg)] border border-primary/20 bg-primary-soft/30 p-4">
+                <p class="mb-2.5 text-sm font-medium text-ink">✦ {{ count($variants) }} variasi dijana — pilih yang terbaik:</p>
+                <div class="flex flex-wrap gap-2">
+                    @foreach ($variants as $i => $v)
+                        <button wire:click="selectVariant({{ $i }})" class="rounded-full border px-4 py-2 text-sm font-medium transition {{ $selectedVariant === $i ? 'border-primary bg-primary text-primary-fg shadow-sm' : 'border-border bg-bg text-ink-soft hover:bg-muted-surface' }}">
+                            Variasi {{ $i + 1 }}<span class="opacity-75"> · {{ $vlabels[$i] ?? '' }}</span>
+                        </button>
+                    @endforeach
+                </div>
+            </div>
+        @endif
         <div class="grid gap-6 lg:grid-cols-5">
             <div class="space-y-4 lg:col-span-2">
                 <x-ui.card>
-                    <x-ui.card-header title="Salespage anda dah siap 🎉" subtitle="Semak preview, kemudian simpan.">
+                    <x-ui.card-header title="Salespage anda dah siap 🎉" subtitle="Tukar variasi & semak preview, kemudian simpan.">
                         <x-slot:action>
                             <x-ui.badge :tone="$source === 'mock' ? 'muted' : 'primary'">{{ $source === 'mock' ? 'Contoh' : '✦ Dijana AI' }}</x-ui.badge>
                         </x-slot:action>
@@ -205,8 +218,14 @@
             </div>
             <div class="lg:col-span-3">
                 <x-ui.card class="overflow-hidden">
+                    @if (! $posterDone)<div wire:init="makePoster"></div>@endif
                     <x-ui.card-header title="Pratonton langsung">
-                        <x-slot:action><x-ui.badge tone="muted"><x-lucide-smartphone class="size-3.5" /> Mobile</x-ui.badge></x-slot:action>
+                        <x-slot:action>
+                            <div class="flex items-center gap-2">
+                                <span wire:loading wire:target="makePoster" class="flex items-center gap-1 text-xs font-medium text-primary"><x-lucide-loader-circle class="size-3 animate-spin" /> menjana poster AI…</span>
+                                <x-ui.badge tone="muted"><x-lucide-smartphone class="size-3.5" /> Mobile</x-ui.badge>
+                            </div>
+                        </x-slot:action>
                     </x-ui.card-header>
                     <x-ui.card-body class="bg-muted-surface/60 p-5">
                         <div class="mx-auto max-w-[380px] overflow-hidden rounded-[24px] border-[6px] border-ink/90 bg-bg shadow-2xl">

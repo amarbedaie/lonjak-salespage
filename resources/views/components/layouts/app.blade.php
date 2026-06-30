@@ -8,6 +8,7 @@
         ['Salespage', 'salespages.index', 'file-text', fn () => request()->is('dashboard/salespages*')],
         ['Order', 'orders.index', 'shopping-cart', fn () => request()->is('dashboard/orders*')],
         ['Produk', 'products.index', 'package', fn () => request()->is('dashboard/products*')],
+        ['Kupon', 'coupons.index', 'ticket-percent', fn () => request()->is('dashboard/coupons*')],
         ['Analitik', 'analytics', 'bar-chart-3', fn () => request()->is('dashboard/analytics')],
     ];
     $operasi = [

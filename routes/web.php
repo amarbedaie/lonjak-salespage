@@ -51,7 +51,8 @@ Route::middleware(['auth', 'not.suspended'])->prefix('dashboard')->group(functio
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
-    Route::view('/payments', 'dashboard.payments')->name('payments');
+    Route::get('/payments', [\App\Http\Controllers\PaymentSettingsController::class, 'index'])->name('payments');
+    Route::post('/payments', [\App\Http\Controllers\PaymentSettingsController::class, 'update'])->name('payments.update');
     Route::view('/shipping', 'dashboard.shipping')->name('shipping');
     Route::get('/recovery', [RecoveryController::class, 'index'])->name('recovery');
     Route::get('/affiliate', [AffiliateController::class, 'index'])->name('affiliate');

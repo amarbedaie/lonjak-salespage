@@ -3,29 +3,46 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Webimpian\BayarcashSdk\Bayarcash;
 use Webimpian\BayarcashSdk\Fpx;
 
 /**
- * BayarCash (FPX / DuitNow) integration. Checksum is signed with the API SECRET.
- * The server callback (webhook) is authoritative; the browser return is best-effort.
- * (Named *Gateway to avoid a case-insensitive clash with the SDK's Bayarcash class.)
+ * Per-merchant BayarCash (FPX / DuitNow) gateway. Each merchant stores their own
+ * credentials, so a salespage checkout charges the *salespage owner's* account.
+ * Checksum is signed with the API SECRET; the server webhook is authoritative.
  */
 class BayarcashGateway
 {
-    public static function enabled(): bool
+    public function __construct(
+        private string $pat,
+        private string $portalKey,
+        private string $apiSecret,
+        private bool $sandbox = false,
+    ) {}
+
+    public static function forMerchant(User $merchant): ?self
     {
-        return (bool) config('services.bayarcash.api_secret') && (bool) config('services.bayarcash.token');
+        if (! $merchant->hasBayarcash()) {
+            return null;
+        }
+
+        return new self(
+            $merchant->bayarcash_pat,
+            $merchant->bayarcash_portal_key,
+            $merchant->bayarcash_api_secret,
+            (bool) $merchant->bayarcash_sandbox,
+        );
     }
 
     private function client(): Bayarcash
     {
-        $client = new Bayarcash(config('services.bayarcash.token'));
-        if (config('services.bayarcash.sandbox')) {
+        $client = new Bayarcash($this->pat);
+        if ($this->sandbox) {
             $client->useSandbox();
         }
-        $client->setApiVersion(config('services.bayarcash.api_version', 'v3'));
+        $client->setApiVersion('v3');
 
         return $client;
     }
@@ -33,11 +50,10 @@ class BayarcashGateway
     public function createPayment(Order $order): RedirectResponse
     {
         $client = $this->client();
-        $secret = config('services.bayarcash.api_secret');
 
         $data = [
-            'payment_channel' => config('services.bayarcash.channel', 1),
-            'portal_key' => config('services.bayarcash.portal_key'),
+            'payment_channel' => 1, // FPX
+            'portal_key' => $this->portalKey,
             'order_number' => 'LJK'.$order->id,
             'amount' => number_format((float) $order->total, 2, '.', ''),
             'payer_name' => $order->customer,
@@ -46,32 +62,32 @@ class BayarcashGateway
             'return_url' => route('payment.return'),
             'callback_url' => route('payment.callback'),
         ];
-        $data['checksum'] = $client->createPaymentIntentChecksumValue($secret, $data);
+        $data['checksum'] = $client->createPaymentIntentChecksumValue($this->apiSecret, $data);
 
         $intent = $client->createPaymentIntent($data);
-
         $order->update(['payment_ref' => $intent->id ?? null]);
 
         return redirect()->away($intent->url);
     }
 
-    /** Verify + apply a callback (return or webhook). Returns the order if paid. */
-    public function apply(array $callback, bool $isWebhook): ?Order
+    /** Verify a callback against the order owner's secret; apply status. Returns the order if paid. */
+    public static function applyCallback(array $callback, bool $isWebhook): ?Order
     {
-        $client = $this->client();
-        $secret = config('services.bayarcash.api_secret');
-
-        $verified = $isWebhook
-            ? $client->verifyTransactionCallbackData($callback, $secret)
-            : $client->verifyReturnUrlCallbackData($callback, $secret);
-
-        if (! $verified) {
+        $id = (int) preg_replace('/\D/', '', $callback['order_number'] ?? '');
+        $order = Order::with('user')->find($id);
+        if (! $order || ! $order->user) {
+            return null;
+        }
+        $gateway = self::forMerchant($order->user);
+        if (! $gateway) {
             return null;
         }
 
-        $id = (int) preg_replace('/\D/', '', $callback['order_number'] ?? '');
-        $order = Order::find($id);
-        if (! $order) {
+        $client = $gateway->client();
+        $verified = $isWebhook
+            ? $client->verifyTransactionCallbackData($callback, $gateway->apiSecret)
+            : $client->verifyReturnUrlCallbackData($callback, $gateway->apiSecret);
+        if (! $verified) {
             return null;
         }
 
@@ -86,5 +102,24 @@ class BayarcashGateway
         }
 
         return null;
+    }
+
+    /** Validate raw credentials by hitting the portals endpoint. */
+    public static function validateCredentials(string $pat, bool $sandbox): bool
+    {
+        try {
+            $client = new Bayarcash($pat);
+            if ($sandbox) {
+                $client->useSandbox();
+            }
+            $client->setApiVersion('v3');
+            $client->getPortals();
+
+            return true;
+        } catch (\Throwable $e) {
+            // The SDK throws a TypeError while *parsing* a valid response (null websiteUrl);
+            // that still proves the token authenticated. Only a 401/auth message is a real failure.
+            return ! str_contains(strtolower($e->getMessage()), 'unauthenticated');
+        }
     }
 }

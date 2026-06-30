@@ -55,14 +55,13 @@ class PublicController extends Controller
             'payment_status' => 'belum',
         ]);
 
-        // Online payment (BayarCash) when configured; else COD/manual confirmation.
-        if (\App\Services\BayarcashGateway::enabled() && $salespage->gateway === 'BayarCash') {
-            \App\Services\Mailer::orderReceived($order);
-
-            return app(\App\Services\BayarcashGateway::class)->createPayment($order);
-        }
-
         \App\Services\Mailer::orderReceived($order);
+
+        // Online payment uses the salespage OWNER's own BayarCash; else COD/manual.
+        $gateway = \App\Services\BayarcashGateway::forMerchant($salespage->user);
+        if ($gateway && $salespage->gateway === 'BayarCash') {
+            return $gateway->createPayment($order);
+        }
 
         return redirect()->route('salespage.public', $slug)->with('ordered', true);
     }

@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Services\BayarcashGateway;
+use App\Services\Mailer;
 use Illuminate\Http\Request;
 
 class PaymentController extends Controller
 {
     // Browser is redirected here after paying (best-effort).
-    public function return(Request $request, BayarcashGateway $bayarcash)
+    public function return(Request $request)
     {
-        $order = $bayarcash->apply($request->all(), isWebhook: false);
+        $order = BayarcashGateway::applyCallback($request->all(), isWebhook: false);
 
         if ($order && $order->salespage) {
             return redirect()->route('salespage.public', $order->salespage->slug)->with('ordered', true);
@@ -20,12 +21,12 @@ class PaymentController extends Controller
     }
 
     // Server-to-server webhook (authoritative). Verify, mark paid, email.
-    public function callback(Request $request, BayarcashGateway $bayarcash)
+    public function callback(Request $request)
     {
-        $order = $bayarcash->apply($request->all(), isWebhook: true);
+        $order = BayarcashGateway::applyCallback($request->all(), isWebhook: true);
 
         if ($order) {
-            \App\Services\Mailer::orderPaid($order);
+            Mailer::orderPaid($order);
         }
 
         return response('OK', 200);

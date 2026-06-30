@@ -1,5 +1,5 @@
 <x-layouts.app :title="$salespage->title">
-    @php $rm = fn ($n) => 'RM'.number_format($n, 2); $page = $salespage->blocks ?? ['blocks' => []]; @endphp
+    @php $rm = fn ($n) => 'RM'.number_format($n, 2); $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); @endphp
     <div class="space-y-6" x-data="{ tab: 'design' }">
         <div class="flex flex-wrap items-center gap-3">
             <a href="{{ route('salespages.index') }}" class="inline-flex size-9 items-center justify-center rounded-[var(--radius-md)] border border-border text-ink-soft hover:bg-muted-surface"><x-lucide-arrow-left class="size-4.5" /></a>

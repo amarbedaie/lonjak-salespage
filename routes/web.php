@@ -48,7 +48,11 @@ Route::middleware(['auth', 'not.suspended'])->prefix('dashboard')->group(functio
     Route::post('/orders/{order}/status', [OrderController::class, 'setStatus'])->name('orders.status');
 
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
+    Route::get('/products/new', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');
+    Route::get('/products/{product}/edit', [ProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [ProductController::class, 'update'])->name('products.update');
+    Route::delete('/products/{product}', [ProductController::class, 'destroy'])->name('products.destroy');
 
     Route::get('/analytics', [AnalyticsController::class, 'index'])->name('analytics');
     Route::get('/payments', [\App\Http\Controllers\PaymentSettingsController::class, 'index'])->name('payments');

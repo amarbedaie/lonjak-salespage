@@ -1,8 +1,33 @@
 @php
     $blocks = $page['blocks'] ?? [];
+    $images = array_values(array_filter($page['images'] ?? []));
+    $video = $page['video'] ?? null;
     $rm = fn ($n) => 'RM' . number_format((float) $n, 2);
+    $embed = null;
+    if ($video) {
+        if (preg_match('~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|shorts/))([\w-]+)~', $video, $m)) {
+            $embed = 'https://www.youtube.com/embed/' . $m[1];
+        } elseif (preg_match('~vimeo\.com/(\d+)~', $video, $m)) {
+            $embed = 'https://player.vimeo.com/video/' . $m[1];
+        }
+    }
 @endphp
 <div class="bg-bg">
+    @if (!empty($images))
+        <img src="{{ $images[0] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover">
+    @endif
+    @if ($embed)
+        <div class="aspect-video w-full bg-black"><iframe src="{{ $embed }}" class="size-full" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe></div>
+    @elseif ($video)
+        <video src="{{ $video }}" controls class="aspect-video w-full bg-black object-contain"></video>
+    @endif
+    @if (count($images) > 1)
+        <div class="scroll-thin flex gap-2 overflow-x-auto px-4 py-3">
+            @foreach (array_slice($images, 1) as $img)
+                <img src="{{ $img }}" class="size-20 shrink-0 rounded-[var(--radius-md)] border border-border object-cover" alt="">
+            @endforeach
+        </div>
+    @endif
     @foreach ($blocks as $b)
         @php $type = $b['type'] ?? ''; @endphp
         @switch($type)

@@ -1,5 +1,5 @@
 <x-layouts.base :title="$salespage->title">
-    @php $page = $salespage->blocks ?? ['blocks' => []]; $price = (float) $salespage->price;
+    @php $page = array_merge($salespage->blocks ?? ['blocks' => []], ['images' => $salespage->imageUrls(), 'video' => $salespage->video_url]); $price = (float) $salespage->price;
     $states = ['Selangor', 'Kuala Lumpur', 'Johor', 'Pulau Pinang', 'Perak', 'Kedah', 'Kelantan', 'Terengganu', 'Pahang', 'Melaka', 'Negeri Sembilan', 'Perlis', 'Sabah', 'Sarawak', 'Putrajaya', 'Labuan']; @endphp
     <div class="min-h-screen bg-muted-surface/40 py-6">
         <div class="mx-auto max-w-md overflow-hidden rounded-[var(--radius-xl)] border border-border bg-bg elev-2">

@@ -1,4 +1,16 @@
-<div class="space-y-6">
+<div class="space-y-6" x-data="{
+    genPct: 0, genStep: 0,
+    genSteps: ['Menganalisa produk & audiens', 'Membina hook & headline', 'Menyusun offer & bukti sosial', 'Menyiapkan jaminan & urgency', 'Menyiapkan FAQ & CTA'],
+    genTimer: null,
+    genBegin() {
+        this.genPct = 0; this.genStep = 0;
+        clearInterval(this.genTimer);
+        this.genTimer = setInterval(() => {
+            if (this.genPct < 93) this.genPct += Math.max(1, Math.round((93 - this.genPct) / 26));
+            this.genStep = Math.min(this.genSteps.length - 1, Math.floor(this.genPct / (94 / this.genSteps.length)));
+        }, 240);
+    },
+}">
     <div class="flex items-center gap-3">
         <a href="{{ route('salespages.index') }}" class="inline-flex size-9 items-center justify-center rounded-[var(--radius-md)] border border-border text-ink-soft hover:bg-muted-surface">
             <x-lucide-arrow-left class="size-4.5" />
@@ -9,19 +21,31 @@
         </div>
     </div>
 
-    {{-- Generating overlay --}}
+    {{-- Generating overlay — step-by-step progress + percent --}}
     <div wire:loading.flex wire:target="generate" class="fixed inset-0 z-[1400] flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <x-ui.card class="mx-auto w-full max-w-md">
             <x-ui.card-body class="py-10 text-center">
-                <div class="mx-auto flex size-14 items-center justify-center rounded-full bg-primary-soft">
-                    <x-lucide-loader-circle class="size-7 animate-spin text-primary" />
+                <div class="relative mx-auto flex size-20 items-center justify-center">
+                    <svg class="size-20 -rotate-90" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="16" fill="none" class="stroke-primary/15" stroke-width="3" />
+                        <circle cx="18" cy="18" r="16" fill="none" class="stroke-primary" stroke-width="3" stroke-linecap="round"
+                                stroke-dasharray="100.5" :stroke-dashoffset="100.5 * (1 - genPct / 100)" style="transition: stroke-dashoffset .25s ease" />
+                    </svg>
+                    <span class="absolute text-base font-bold text-primary tnum" x-text="genPct + '%'"></span>
                 </div>
                 <h2 class="mt-5 text-lg font-semibold text-ink">AI sedang menulis salespage anda…</h2>
                 <p class="mt-1 text-sm text-muted">Biasanya ambil 10–20 saat.</p>
                 <ul class="mx-auto mt-6 max-w-sm space-y-2.5 text-left text-sm">
-                    @foreach (['Menganalisa produk & audiens', 'Membina hook & headline', 'Menyusun offer & bukti sosial', 'Menyiapkan FAQ & CTA'] as $s)
-                        <li class="flex items-center gap-3 text-ink-soft"><x-lucide-loader-circle class="size-3.5 animate-spin text-primary" /> {{ $s }}…</li>
-                    @endforeach
+                    <template x-for="(s, i) in genSteps" :key="i">
+                        <li class="flex items-center gap-3 transition-colors" :class="i < genStep ? 'text-success font-medium' : (i === genStep ? 'text-ink' : 'text-muted/50')">
+                            <span class="flex size-5 shrink-0 items-center justify-center">
+                                <svg x-show="i < genStep" class="size-4 text-success" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7.5 7.5a1 1 0 01-1.42 0L4.3 10.7a1 1 0 011.4-1.4l2.79 2.79 6.8-6.79a1 1 0 011.41 0z" clip-rule="evenodd" /></svg>
+                                <span x-show="i === genStep" class="size-3.5 animate-spin rounded-full border-2 border-primary border-t-transparent"></span>
+                                <span x-show="i > genStep" class="size-1.5 rounded-full bg-current opacity-40"></span>
+                            </span>
+                            <span x-text="s + '…'"></span>
+                        </li>
+                    </template>
                 </ul>
             </x-ui.card-body>
         </x-ui.card>
@@ -69,6 +93,29 @@
                     <x-ui.field label="Kelebihan / selling point (pisah dengan koma)">
                         <x-ui.textarea wire:model="benefits" placeholder="cth. nampak hasil 7 hari, bahan semula jadi, sesuai semua kulit" />
                     </x-ui.field>
+
+                    <x-ui.field label="Gambar produk" hint="pilihan — akan dipapar pada salespage">
+                        <label class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-dashed border-border bg-muted-surface/40 px-4 py-3 text-sm text-ink-soft hover:bg-muted-surface">
+                            <x-lucide-image-plus class="size-5 text-muted" />
+                            <span wire:loading.remove wire:target="newImages">Klik untuk muat naik gambar (boleh banyak)</span>
+                            <span wire:loading wire:target="newImages" class="text-primary">Memuat naik…</span>
+                            <input type="file" wire:model="newImages" multiple accept="image/*" class="hidden">
+                        </label>
+                        @error('newImages.*')<p class="mt-1 text-xs text-danger">{{ $message }}</p>@enderror
+                        @if ($images)
+                            <div class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-5">
+                                @foreach ($images as $i => $img)
+                                    <div class="group relative aspect-square overflow-hidden rounded-[var(--radius-md)] border border-border">
+                                        <img src="{{ asset('storage/'.$img) }}" class="size-full object-cover" alt="">
+                                        <button type="button" wire:click="removeImage({{ $i }})" class="absolute right-1 top-1 flex size-5 items-center justify-center rounded-full bg-black/60 text-xs text-white opacity-0 transition group-hover:opacity-100">&times;</button>
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+                    </x-ui.field>
+                    <x-ui.field label="Video produk" hint="link YouTube / Vimeo (pilihan)">
+                        <x-ui.input wire:model="videoUrl" placeholder="https://youtu.be/..." />
+                    </x-ui.field>
                 </x-ui.card-body>
             </x-ui.card>
 
@@ -83,7 +130,7 @@
                             <span class="text-muted">Kredit AI</span>
                             <span class="font-medium text-ink">{{ auth()->user()->ai_credits }} / 3 tinggal</span>
                         </div>
-                        <x-ui.button wire:click="generate" size="lg" class="mt-4 w-full">
+                        <x-ui.button wire:click="generate" x-on:click="genBegin()" size="lg" class="mt-4 w-full">
                             <x-lucide-sparkles class="size-4" /> Jana salespage
                         </x-ui.button>
                     </x-ui.card-body>
@@ -122,7 +169,7 @@
                     <x-ui.button wire:click="publish" size="lg">Simpan salespage</x-ui.button>
                     <div class="grid grid-cols-2 gap-2">
                         <x-ui.button wire:click="back" variant="outline"><x-lucide-rotate-cw class="size-4" /> Edit brief</x-ui.button>
-                        <x-ui.button wire:click="generate" variant="outline"><x-lucide-sparkles class="size-4" /> Jana semula</x-ui.button>
+                        <x-ui.button wire:click="generate" x-on:click="genBegin()" variant="outline"><x-lucide-sparkles class="size-4" /> Jana semula</x-ui.button>
                     </div>
                 </div>
             </div>
@@ -134,7 +181,7 @@
                     <x-ui.card-body class="bg-muted-surface/60 p-5">
                         <div class="mx-auto max-w-[380px] overflow-hidden rounded-[24px] border-[6px] border-ink/90 bg-bg shadow-2xl">
                             <div class="max-h-[640px] overflow-y-auto scroll-thin">
-                                @include('partials.salespage', ['page' => $page])
+                                @include('partials.salespage', ['page' => array_merge($page, ['images' => collect($images)->map(fn ($p) => asset('storage/'.$p))->all(), 'video' => $videoUrl])])
                             </div>
                         </div>
                     </x-ui.card-body>

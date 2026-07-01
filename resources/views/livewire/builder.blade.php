@@ -234,7 +234,7 @@
                     <x-ui.card-body class="bg-muted-surface/60 p-5">
                         <div class="mx-auto max-w-[380px] overflow-hidden rounded-[24px] border-[6px] border-ink/90 bg-bg shadow-2xl">
                             <div class="max-h-[640px] overflow-y-auto scroll-thin">
-                                @include('partials.salespage', ['page' => array_merge($page, ['images' => collect($images)->map(fn ($p) => asset('storage/'.$p))->all(), 'video' => $videoUrl, 'theme' => 'default'])])
+                                @include('partials.salespage', ['page' => array_merge($page, ['images' => collect($images)->map(fn ($p) => asset('storage/'.$p))->all(), 'video' => $videoUrl, 'theme' => $theme])])
                             </div>
                         </div>
                     </x-ui.card-body>

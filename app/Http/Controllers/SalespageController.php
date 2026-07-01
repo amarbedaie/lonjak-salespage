@@ -51,7 +51,7 @@ class SalespageController extends Controller
             'price' => 'required|numeric|min:0',
             'compare_price' => 'nullable|numeric|min:0',
             'gateway' => 'nullable|string',
-            'theme' => 'nullable|in:default,hijau,biru,oren,gelap',
+            'theme' => 'nullable|in:default,hijau,biru,oren,ungu,gelap',
             'fb_pixel' => 'nullable|string|max:50',
             'tiktok_pixel' => 'nullable|string|max:50',
             'ga_id' => 'nullable|string|max:50',

@@ -98,7 +98,7 @@
                         <x-ui.field label="Harga coret (RM)"><x-ui.input name="compare_price" type="number" value="{{ $salespage->compare_price }}" /></x-ui.field>
                         <x-ui.field label="Tema warna" hint="rupa salespage">
                             <x-ui.select name="theme">
-                                @foreach (['default' => 'Pink (default)', 'hijau' => 'Hijau Islamik + Emas', 'biru' => 'Teal / Biru', 'oren' => 'Oren Hangat', 'gelap' => 'Gelap'] as $v => $l)
+                                @foreach (['default' => 'Pink (default)', 'hijau' => 'Hijau Islamik + Emas', 'biru' => 'Teal / Biru', 'oren' => 'Oren Hangat', 'ungu' => 'Ungu / Purple', 'gelap' => 'Gelap'] as $v => $l)
                                     <option value="{{ $v }}" @selected(($salespage->theme ?? 'default') === $v)>{{ $l }}</option>
                                 @endforeach
                             </x-ui.select>

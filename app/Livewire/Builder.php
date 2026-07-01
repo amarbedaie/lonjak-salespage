@@ -31,6 +31,7 @@ class Builder extends Component
     public array $variants = [];      // multiple generated variants
     public int $selectedVariant = 0;
     public bool $posterDone = false;
+    public string $theme = 'default'; // AI-picked color scheme (matches product)
     public ?int $productId = null;
 
     public array $images = [];        // stored image paths
@@ -182,6 +183,9 @@ class Builder extends Component
                 $directed['need_poster'] = false;
             }
         }
+        if (! empty($directed['theme'])) {
+            $this->theme = $directed['theme'];
+        }
 
         return $directed;
     }
@@ -210,6 +214,7 @@ class Builder extends Component
             'price' => $this->price ?? 0,
             'compare_price' => $this->comparePrice,
             'category' => $this->category,
+            'theme' => $this->theme,
             'status' => 'draf',
             'brief' => [
                 'name' => $this->name, 'price' => $this->price, 'comparePrice' => $this->comparePrice,

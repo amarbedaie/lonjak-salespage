@@ -292,6 +292,9 @@ TXT;
         // Need a poster only if nothing was placed in the hero.
         $heroHasImage = collect($blocks)->first(fn ($b) => ($b['type'] ?? '') === 'hero' && ! empty($b['image']));
         $page['need_poster'] = ! $heroHasImage && (bool) ($plan['need_poster'] ?? false);
+        if (in_array($plan['theme'] ?? '', ['default', 'hijau', 'biru', 'oren', 'ungu', 'gelap'], true)) {
+            $page['theme'] = $plan['theme'];
+        }
 
         return $page;
     }
@@ -309,7 +312,8 @@ TXT;
                 . 'gambar produk/mockup → hero atau offer; gambar emosi/lifestyle/orang → problem atau agitate; '
                 . 'gambar produk digunakan/demo → solution; screenshot bukti/testimoni → proof. '
                 . 'Satu gambar satu blok. Kalau gambar tak sesuai untuk hero & tiada mockup produk, set need_poster=true. '
-                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false, "scenes": {"problem":"...","agitate":"..."}}. '
+                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false, "scenes": {"problem":"...","agitate":"..."}, "theme": "hijau"}. '
+                . 'TAMBAHAN "theme" (PENTING) — pilih SATU tema warna yang paling MATCH warna dominan gambar produk & vibe niche, dari: default (pink), hijau (hijau+emas, Islamik/rohani), biru (teal), oren (hangat), ungu (purple), gelap. Cth: cover buku ungu/teal → "ungu"; produk Islamik hijau → "hijau"; skincare pink → "default". JANGAN pilih warna yang MELAWAN warna gambar produk. '
                 . 'Jenis blok sah: hero, problem, agitate, solution, offer, bonus, proof, guarantee, urgency, faq, cta, ps. '
                 . 'TAMBAHAN PENTING — "scenes": untuk seksyen EMOSI (hero jika tiada gambar produk, problem, agitate) yang TIADA gambar ditugaskan, tulis satu ayat English ringkas untuk FOTO EMOSI photorealistic (ORANG sebenar dalam situasi emosi cerita — bukan produk, bukan teks). '
                 . 'Contoh scene tajwid: "a worried Malaysian Muslim man in his 30s holding an open Quran at home, uncertain expression, soft natural window light, candid documentary photo, photorealistic". Buat scene yang MATCH emosi & audiens salespage.';

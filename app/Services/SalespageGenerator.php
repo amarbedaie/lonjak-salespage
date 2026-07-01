@@ -294,6 +294,28 @@ TXT;
             }
         }
 
+        // A real person holding the ACTUAL product, presented to the camera — hero trust shot.
+        if (! empty($imagePaths[0]) && config('services.openrouter.key')) {
+            if ($held = $this->holdingProductImage($imagePaths[0])) {
+                $heldUrl = asset('storage/' . $held);
+                foreach ($blocks as $i => $b) {
+                    if (($b['type'] ?? '') === 'hero') {
+                        $flat = $blocks[$i]['image'] ?? null;   // existing flat mockup, if any
+                        $blocks[$i]['image'] = $heldUrl;
+                        if ($flat) {                            // keep the clean cover in the solution section
+                            foreach ($blocks as $j => $bj) {
+                                if (($bj['type'] ?? '') === 'solution' && empty($blocks[$j]['image'])) {
+                                    $blocks[$j]['image'] = $flat;
+                                    break;
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
         $page['blocks'] = $blocks;
         $page['video_block'] = $plan['video_block'] ?? ($video ? 'hero' : null);
         $page['gallery'] = array_values(array_filter($urls, fn ($u, $i) => ! isset($used[$i]), ARRAY_FILTER_USE_BOTH));
@@ -401,17 +423,52 @@ TXT;
         }
     }
 
-    /** Generate a photorealistic image from a prompt via gemini-3-pro-image; returns a stored path or null. */
-    public function imageFromPrompt(string $prompt): ?string
+    /**
+     * Photorealistic image of a real person HOLDING the actual product, presented toward the camera.
+     * Uses the product image as a reference (image-to-image) so the real cover is kept — builds trust.
+     */
+    public function holdingProductImage(string $productPath): ?string
+    {
+        $prompt = 'PHOTOREALISTIC photograph: a warm, friendly Malaysian Muslim person in modest, respectful attire '
+            . 'HOLDING the exact book shown in the reference image and presenting it toward the camera with both hands — '
+            . 'the book cover faces the camera, fully visible and in sharp focus. Reproduce the book cover EXACTLY as in the '
+            . 'reference image (identical title text, artwork, colours, layout); do NOT change, translate, or invent any cover text. '
+            . 'Upper-body shot, genuine smile, looking at the camera. Bright, clean, softly-lit indoor background, natural light, '
+            . 'shallow depth of field, premium yet authentic UGC style. '
+            . 'STRICT: must look like a REAL photograph — absolutely NOT a cartoon, illustration, painting, anime, or 3D render. '
+            . 'No added text, captions, logos, or watermark anywhere in the image.';
+
+        return $this->imageFromPrompt($prompt, [$productPath]);
+    }
+
+    /**
+     * Generate a photorealistic image via gemini-3-pro-image; returns a stored path or null.
+     * Pass $refPaths (public-disk paths) to do image-to-image (e.g. keep a real product/book in the shot).
+     */
+    public function imageFromPrompt(string $prompt, array $refPaths = []): ?string
     {
         if (! ($key = config('services.openrouter.key'))) {
             return null;
         }
         try {
+            $content = $prompt;
+            if (! empty($refPaths)) {
+                $content = [['type' => 'text', 'text' => $prompt]];
+                foreach (array_slice($refPaths, 0, 2) as $p) {
+                    try {
+                        $bytes = \Illuminate\Support\Facades\Storage::disk('public')->get($p);
+                        if ($bytes) {
+                            $content[] = ['type' => 'image_url', 'image_url' => ['url' => 'data:image/png;base64,' . base64_encode($bytes)]];
+                        }
+                    } catch (Throwable $e) {
+                        // skip an unreadable reference
+                    }
+                }
+            }
             $res = Http::withToken($key)->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
                 'model' => 'google/gemini-3-pro-image',
                 'modalities' => ['image', 'text'],
-                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'messages' => [['role' => 'user', 'content' => $content]],
             ]);
             $url = data_get($res->json(), 'choices.0.message.images.0.image_url.url');
             if (! is_string($url) || ! str_starts_with($url, 'data:image')) {

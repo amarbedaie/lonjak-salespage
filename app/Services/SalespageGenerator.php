@@ -269,6 +269,22 @@ TXT;
             }
         }
 
+        // Generate photorealistic EMOTIONAL photos for scene-marked blocks with no image yet.
+        $scenes = is_array($plan['scenes'] ?? null) ? $plan['scenes'] : [];
+        foreach ($scenes as $blockType => $scenePrompt) {
+            if (! is_string($scenePrompt) || strlen(trim($scenePrompt)) < 10) {
+                continue;
+            }
+            foreach ($blocks as $i => $b) {
+                if (($b['type'] ?? '') === $blockType && empty($blocks[$i]['image'])) {
+                    if ($img = $this->imageFromPrompt($scenePrompt . '. Photorealistic candid documentary photo of a real person, emotional & authentic, soft natural light. Absolutely NOT a cartoon/illustration/3D-render. No text, no words, no watermark.')) {
+                        $blocks[$i]['image'] = asset('storage/' . $img);
+                    }
+                    break;
+                }
+            }
+        }
+
         $page['blocks'] = $blocks;
         $page['video_block'] = $plan['video_block'] ?? ($video ? 'hero' : null);
         $page['gallery'] = array_values(array_filter($urls, fn ($u, $i) => ! isset($used[$i]), ARRAY_FILTER_USE_BOTH));
@@ -292,8 +308,10 @@ TXT;
                 . 'gambar produk/mockup → hero atau offer; gambar emosi/lifestyle/orang → problem atau agitate; '
                 . 'gambar produk digunakan/demo → solution; screenshot bukti/testimoni → proof. '
                 . 'Satu gambar satu blok. Kalau gambar tak sesuai untuk hero & tiada mockup produk, set need_poster=true. '
-                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false}. '
-                . 'Jenis blok sah: hero, problem, agitate, solution, offer, bonus, proof, guarantee, urgency, faq, cta, ps.';
+                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false, "scenes": {"problem":"...","agitate":"..."}}. '
+                . 'Jenis blok sah: hero, problem, agitate, solution, offer, bonus, proof, guarantee, urgency, faq, cta, ps. '
+                . 'TAMBAHAN PENTING — "scenes": untuk seksyen EMOSI (hero jika tiada gambar produk, problem, agitate) yang TIADA gambar ditugaskan, tulis satu ayat English ringkas untuk FOTO EMOSI photorealistic (ORANG sebenar dalam situasi emosi cerita — bukan produk, bukan teks). '
+                . 'Contoh scene tajwid: "a worried Malaysian Muslim man in his 30s holding an open Quran at home, uncertain expression, soft natural window light, candid documentary photo, photorealistic". Buat scene yang MATCH emosi & audiens salespage.';
 
             $parts = [['type' => 'text', 'text' => $instruction]];
             foreach ($imagePaths as $i => $path) {
@@ -361,6 +379,22 @@ TXT;
                 . 'Render an accurate, believable real-life product/mockup that fits this exact product, with tasteful props & setting that match its theme. '
                 . 'Style: realistic commercial product photography, soft natural lighting, clean elegant background, shallow depth of field, sharp focus, premium, high detail. '
                 . 'STRICT: photorealistic only — absolutely NOT a cartoon, NOT an illustration, NOT a stylised 3D cartoon. No text/words/watermark in the image.';
+
+            return $this->imageFromPrompt($prompt);
+        } catch (Throwable $e) {
+            report($e);
+
+            return null;
+        }
+    }
+
+    /** Generate a photorealistic image from a prompt via gemini-3-pro-image; returns a stored path or null. */
+    public function imageFromPrompt(string $prompt): ?string
+    {
+        if (! ($key = config('services.openrouter.key'))) {
+            return null;
+        }
+        try {
             $res = Http::withToken($key)->timeout(120)->post('https://openrouter.ai/api/v1/chat/completions', [
                 'model' => 'google/gemini-3-pro-image',
                 'modalities' => ['image', 'text'],

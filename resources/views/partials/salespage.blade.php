@@ -51,11 +51,25 @@
         @php $type = $b['type'] ?? ''; @endphp
         @switch($type)
             @case('hero')
-                <section class="{{ $T['heroBg'] }} px-6 pb-2 pt-8 text-center">
+                @php
+                    $hs = $b['style'] ?? 'classic';
+                    $hasNum = (bool) preg_match('/^\s*(\d[\d.,]*\s*\+?)\s+(.+)/u', $b['headline'] ?? '', $hm);
+                @endphp
+                <section class="{{ $T['heroBg'] }} px-6 pb-2 {{ $hs === 'image-first' && ! empty($b['image']) ? 'pt-0' : 'pt-8' }} text-center">
+                    @if ($hs === 'image-first' && ! empty($b['image']))
+                        <div class="-mx-6 mb-7 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="w-full bg-muted-surface object-cover"></div>
+                    @endif
                     <span class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[0.7rem] font-extrabold uppercase tracking-wide {{ $T['badge'] }}">{{ $b['badge'] ?? 'Jangan tangguh lagi' }}</span>
-                    <h1 class="font-display mx-auto mt-5 max-w-[17ch] text-[1.95rem] font-black leading-[1.12] text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
+                    @if ($hs === 'bold-number' && $hasNum)
+                        <div class="mt-4">
+                            <span class="font-display block text-[4.75rem] font-black leading-[0.82] tracking-tight {{ $T['heroText'] }}">{{ trim($hm[1]) }}</span>
+                            <h1 class="font-display mx-auto mt-2 max-w-[20ch] text-[1.5rem] font-black leading-[1.15] text-balance {{ $T['heroText'] }}">{{ $hm[2] }}</h1>
+                        </div>
+                    @else
+                        <h1 class="font-display mx-auto mt-5 max-w-[17ch] text-[1.95rem] font-black leading-[1.12] text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
+                    @endif
                     <p class="mx-auto mt-4 max-w-[34ch] text-[0.95rem] leading-relaxed {{ $T['heroSub'] }}">{!! $hl($b['body'] ?? '') !!}</p>
-                    @if (! empty($b['image']))
+                    @if ($hs !== 'image-first' && ! empty($b['image']))
                         <div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="mx-auto w-full max-w-md bg-muted-surface object-cover"></div>
                     @endif
                     @if (! empty($b['bullets']))

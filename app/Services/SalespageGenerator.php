@@ -152,7 +152,7 @@ TXT;
     {
         $compare = $brief['comparePrice'] ?? $brief['compare_price'] ?? null;
         return collect([
-            'Jana salespage lengkap untuk produk berikut. Ikut struktur 12-blok.',
+            'Jana salespage LONG-FORM lengkap untuk produk berikut. Ikut struktur blok penuh & WAJIB ada 5 senjata (hook angka di hero, blok listicle bernombor, faedah rare, jambatan "kena ada guru", offer spesifik).',
             '',
             'Nama produk: ' . ($brief['name'] ?? ''),
             'Harga jualan: RM' . ($brief['price'] ?? 0),
@@ -162,7 +162,23 @@ TXT;
             'Masalah yang diselesaikan: ' . ($brief['problem'] ?? ''),
             'Kelebihan / selling point: ' . ($brief['benefits'] ?? ''),
             'Tona: ' . ($brief['tone'] ?? 'santai'),
+            '',
+            $this->productTypeHint($brief),
         ])->filter()->implode("\n");
+    }
+
+    /** Tailor emphasis + block selection to the product type (book / course / physical). */
+    private function productTypeHint(array $brief): string
+    {
+        $hay = mb_strtolower(($brief['category'] ?? '') . ' ' . ($brief['name'] ?? ''));
+        if (preg_match('/buku|book|panduan|kitab|ebook|e-book|novel|majalah|tafsir|quran/u', $hay)) {
+            return 'JENIS PRODUK = BUKU / ILMU. Tekankan: isi kandungan (bab, bilangan muka surat, topik utama), penulis/penerbit & kredibiliti, ilmu & transformasi yang pembaca dapat, format (cetak/PDF/audio). Offer mesti senaraikan APA DALAM buku + bonus ilmu. Blok "author" WAJIB ada. Gaya bahasa lebih ilmiah tapi mesra.';
+        }
+        if (preg_match('/kelas|kursus|course|online|webinar|bootcamp|latihan|coaching|mentor|akademi/u', $hay)) {
+            return 'JENIS PRODUK = KELAS / KURSUS. Tekankan: modul & silibus (senarai apa diajar), akses (seumur hidup/tempoh), format (video/live/grup), sokongan mentor & komuniti, sijil, kohort/intake terhad (urgency JUJUR). Offer = modul + akses + rakaman + grup + bonus.';
+        }
+
+        return 'JENIS PRODUK = FIZIKAL. Tekankan: bahan/kualiti, hasil yang boleh dilihat & dirasa, cara guna mudah, penghantaran laju (COD), jaminan/pemulangan. Offer = produk + apa disertakan + penghantaran + bonus. Bukti sosial (gambar hasil) penting.';
     }
 
     private function systemPrompt(): string
@@ -180,6 +196,7 @@ TXT;
             . 'WAJIB ADA satu blok "listicle" (letak selepas agitate, sebelum solution): headline bermula dengan ANGKA (cth "7 Kesilapan Tajwid Ramai Buat"), dan guna "items" = array objek {q,a} di mana q = tajuk point pendek & menyentak (renderer akan nomborkan 1,2,3…), a = huraian 1-2 ayat. Beri 5-9 point; point paling mengejut di NOMBOR AKHIR. '
             . 'WAJIB hero ada ANGKA spesifik (dalam badge atau headline). WAJIB blok solution ada jambatan "kena ada guru/panduan tersusun". WAJIB blok offer nyatakan TEPAT apa dalam produk (bab/modul/audio/bonus + nilai). '
             . 'Blok "stats" guna "items" [{q,a}]: q = angka pendek (cth "5,000+"), a = label pendek. Blok "compare" guna "items" [{q,a}]: q = cara biasa/lama (negatif), a = dengan produk (positif). Blok "author" guna headline + body + bullets (kelayakan). Sertakan blok stats (selepas hero), compare & author (sebelum offer) bila munasabah. '
+            . 'GAYA HERO — blok hero BOLEH ada "style": "classic" | "image-first" | "bold-number". Pilih ikut sudut variasi: "bold-number" bila headline MULA dengan angka besar & kau mahu angka jadi fokus visual; "image-first" bila mahu gambar orang-pegang-produk memimpin di paling atas; "classic" = seimbang. Setiap variasi ELOK guna style berbeza supaya 3 variasi nampak berlainan. '
             . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Simpan butiran/penerangan panjang dalam body, BUKAN dalam headline. Headline = pukulan, body = cerita.';
     }
 

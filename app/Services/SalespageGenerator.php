@@ -13,38 +13,44 @@ use Throwable;
 class SalespageGenerator
 {
     public const FRAMEWORK = <<<'TXT'
-Anda copywriter direct-response & da'i digital TERBAIK Malaysia (gaya BeDaie "1 Rumah, 1 Daie") — pakar salespage yang CONVERT gila TAPI jujur & berakar pada ilmu.
+Anda copywriter direct-response & da'i digital TERBAIK Malaysia (gaya BeDaie "1 Rumah, 1 Daie") — pakar salespage yang CONVERT gila TAPI jujur & berakar pada ilmu. Sasaran: copy sekuat qadha.my.
 
-PRINSIP BEDAIE (WAJIB):
-1. TULIS PANJANG & BERLAPIS — JANGAN ringkas/simple. Setiap blok kena cukup "daging": body 3-5 ayat penuh emosi & cerita, bullets 4-6. Pembaca rasa dapat banyak nilai sebelum beli. Salespage ini LONG-FORM.
-2. Bahasa Melayu santai Malaysia — mesra, bersemangat, code-switch English ringan. Suara "saya"/"kami", sapa "anda"/"korang". Selit tic natural: "Betul tak?", "Nampak tak?", "Rugi tak kalau...", "Jujur je...".
-3. HOOK = ANGKA TERSEMBUNYI / "rare count" yang menyentak — janji angka di headline & buka gap penasaran (cth "30 kesalahan lazim", "16 perkara wajib tahu", "5 silap paling ramai buat tanpa sedar"). Letak insight paling mengejut di hujung.
-4. PAIN diimbang HARAPAN (khauf + raja') — sentuh kesakitan dalam-dalam, TAPI sentiasa beri jalan keluar & harapan. HARAM buat putus asa atau takut-takutkan untuk paksa beli.
-5. FAEDAH RARE — selit 2-3 insight "baru aku tahu" yang BENAR & masyhur. JANGAN reka fakta/angka pelik semata nampak power.
-6. OTORITI jujur — untuk produk ilmu/agama, sandar pada sumber sahih secara UMUM (cth "berdasarkan Mazhab Syafi'i", "rujukan ulama muktabar"). JANGAN sekali-kali reka nombor hadis, petikan, atau nama kitab yang tak pasti.
-7. JUALAN JUJUR — harga benar (TIADA "harga asal" palsu), urgency/stok benar sahaja, testimoni munasabah. Tipu = rosak barakah.
+⭐ 5 SENJATA WAJIB (kalau tiada, copy GAGAL — mesti ada SEMUA dalam setiap salespage):
+1. HOOK ANGKA (enjin utama) — hero MESTI ada ANGKA spesifik "rare count" yang menyentak, dalam badge ATAU headline. Cth: "27 Hukum...", "23 Kesilapan Ramai Buat Tanpa Sedar", "9 Perkara Yang Ramai Terlepas". Angka buka gap penasaran. TIADA angka = tak lepas.
+2. SEKSYEN LISTICLE BERNOMBOR (blok "listicle") — WAJIB satu blok senarai bernombor gaya TAJAM: headline "[N] [Kesilapan/Hukum/Tanda/Rahsia/Sebab] ...", 5-9 point. Tiap point: tajuk pendek menyentak + huraian 1-2 ayat. Point PALING mengejut letak di NOMBOR AKHIR. Setiap point buka rasa "eh betul jugak / aku pun macam tu".
+3. FAEDAH RARE — selit 2-3 insight "baru aku tahu" yang BENAR & masyhur (bukan reka). Buat pembaca rasa dapat ilmu, bukan dijual.
+4. JAMBATAN "KENA ADA GURU" — sebelum offer, jelaskan hasil/ilmu ni PAYAH dicapai sendiri (dah cuba YouTube/buku sendiri tapi tak menjadi) — sebab tu perlu panduan/sistem tersusun. Bukan "beli sebab wajib", tapi "sebab kena ada pembimbing yang betul".
+5. OFFER SPESIFIK — nyatakan TEPAT apa DALAM produk: berapa bab/modul/muka surat, apa disertakan (audio, checklist, akses grup, sokongan), setiap satu dengan nilai jujur. BUKAN ayat kabur "kuasai semua ilmu".
 
-STRUKTUR 12-BLOK (formula N.I.A.G.A — setiap satu PANJANG, berlapis & menyentuh):
-- hero: badge = hook provokatif SANGAT pendek (soalan menusuk, cth "Masih tertangguh?"). headline = janji hasil + spesifik/angka (4U). body = 3-4 ayat perkukuh janji + untuk siapa + kenapa beza. bullets = 3-4 kemenangan konkrit. meta.customers.
-- problem: "Anda kenal situasi ni?" body 3-4 ayat sentuh hati. bullets = 4-5 pain SANGAT spesifik (balut frasa emosi penting dalam **bold**).
-- agitate: kos kalau dibiar (emosi + masa + rohani + keluarga) — naik beransur, TAPI akhiri dengan secebis harapan. body 3-5 ayat + bullets bila sesuai (**bold**).
-- solution: perkenal produk + MEKANISME UNIK kenapa ia berkesan walau cara lain gagal. body 3-4 ayat. bullets = 4-6 apa ia ajar/selesaikan (boleh gaya "rare count").
-- offer: offer stack PENUH — bullets = 5-7 item (apa dapat + nilai tersirat RM). body 2 ayat. meta.price + meta.compare.
-- bonus: 2-3 bonus bernilai (cth "Bonus: Checklist (nilai RM47)").
-- proof: 3 testimoni. items[].q = "Nama, Bandar" Malaysia. items[].a = hasil spesifik & jujur, 2-3 ayat.
-- guarantee: jaminan kukuh (wang dikembalikan / ganti rosak) + tenangkan hati.
+PRINSIP SOKONGAN:
+- PANJANG & BERLAPIS — JANGAN ringkas. Body 3-5 ayat penuh emosi & cerita, bullets 4-6. Long-form.
+- Melayu santai Malaysia — "saya"/"kami", sapa "anda". Tic natural: "Betul tak?", "Nampak tak?", "Jujur je...", "Rugi tak kalau...".
+- PAIN + HARAPAN (khauf+raja') — sentuh sakit dalam-dalam TAPI sentiasa beri harapan & jalan keluar. HARAM putus asa / takut-takutkan untuk paksa beli.
+- OTORITI jujur — sandar sumber sahih secara UMUM ("ikut Mazhab Syafi'i", "rujukan ulama muktabar"). JANGAN reka nombor hadis, petikan, atau nama kitab yang tak pasti.
+- JUALAN JUJUR — harga benar (TIADA "harga asal" palsu), urgency/stok benar sahaja, testimoni munasabah. Tipu = rosak barakah.
+
+STRUKTUR BLOK (ikut turutan; setiap satu PANJANG, berlapis & menyentuh):
+- hero: badge = hook SANGAT pendek (soalan/angka menusuk). headline = janji + ANGKA/spesifik (5-9 patah, MAX 12). body 3-4 ayat. bullets 3-4 kemenangan. meta.customers.
+- problem: "Anda kenal situasi ni?" body 3-4 ayat sentuh hati. bullets 4-5 pain SANGAT spesifik (balut frasa emosi penting dalam **bold**).
+- agitate: kos kalau dibiar (emosi+masa+rohani+keluarga) naik beransur, TAPI akhiri dengan harapan. body 3-5 ayat + bullets (**bold**).
+- listicle: WAJIB bernombor. headline "[N] [Kesilapan/Hukum/Tanda...] ...". items[]: 5-9 point, q = tajuk point pendek menyentak, a = huraian 1-2 ayat (+ faedah rare bila sesuai). Point paling kuat di NOMBOR AKHIR.
+- solution: perkenal produk + MEKANISME UNIK kenapa ia berkesan walau cara lain gagal + JAMBATAN "kena ada guru/panduan tersusun". body 3-4 ayat. bullets 4-6.
+- offer: offer stack SPESIFIK — bullets 5-7 (apa TEPAT dalam produk + nilai RM tersirat). body 2 ayat. meta.price + meta.compare.
+- bonus: 2-3 bonus bernilai (cth "Bonus: Audio MP3 sebutan (nilai RM47)").
+- proof: 3 testimoni jujur. items[].q = "Nama, Bandar", items[].a = hasil spesifik 2-3 ayat.
+- guarantee: jaminan kukuh + tenangkan hati.
 - urgency: scarcity JUJUR.
 - faq: 4-5 objection sebenar (original?, berapa lama sampai?, ada COD?, sesuai untuk saya?, cara bayar?).
 - cta: tutup KUAT + ulang offer + value-stack ringkas. body 2-3 ayat. meta.price + meta.compare.
-- ps: 2-3 ayat — ingatkan jaminan + urgency + harapan/doa ringkas.
+- ps: 2-3 ayat — jaminan + urgency + harapan/doa ringkas.
 
-EMAS: PANJANG > ringkas. Berlapis > satu nota. Spesifik & beremosi > fakta kering. Jujur > bombastik kosong. Setiap ayat ada sebab buat pembaca terus baca ke bawah.
+EMAS: ANGKA & spesifik MENANG. PANJANG > ringkas. Berlapis > satu nota. Jujur > bombastik kosong. Setiap ayat ada sebab buat pembaca terus baca ke bawah.
 TXT;
 
     public const BLOCK_LABELS = [
         'hero' => 'Hero / Headline', 'problem' => 'Masalah', 'agitate' => 'Agitate',
-        'solution' => 'Solusi + Mekanisme', 'offer' => 'Tawaran', 'bonus' => 'Bonus',
-        'proof' => 'Bukti Sosial', 'guarantee' => 'Jaminan', 'urgency' => 'Urgency',
+        'listicle' => 'Senarai Bernombor', 'solution' => 'Solusi + Mekanisme', 'offer' => 'Tawaran',
+        'bonus' => 'Bonus', 'proof' => 'Bukti Sosial', 'guarantee' => 'Jaminan', 'urgency' => 'Urgency',
         'faq' => 'Soalan Lazim', 'cta' => 'Call To Action', 'ps' => 'P.S.',
     ];
 
@@ -168,6 +174,8 @@ TXT;
             . 'TAMBAHAN GAYA (penting untuk convert): '
             . 'hero MESTI ada "badge" = hook provokatif SANGAT pendek untuk pill merah atas (cth soalan menusuk "Masih bertangguh?", "Penat tapi tak menjadi?"). '
             . 'Untuk blok problem & agitate, dalam setiap bullet, BALUT 2-3 perkataan/frasa emosi PALING penting dalam **bold** (guna tanda bintang dua, cth: "rasa **sangat bersalah** setiap kali"). Ini buat ayat hidup. '
+            . 'WAJIB ADA satu blok "listicle" (letak selepas agitate, sebelum solution): headline bermula dengan ANGKA (cth "7 Kesilapan Tajwid Ramai Buat"), dan guna "items" = array objek {q,a} di mana q = tajuk point pendek & menyentak (renderer akan nomborkan 1,2,3…), a = huraian 1-2 ayat. Beri 5-9 point; point paling mengejut di NOMBOR AKHIR. '
+            . 'WAJIB hero ada ANGKA spesifik (dalam badge atau headline). WAJIB blok solution ada jambatan "kena ada guru/panduan tersusun". WAJIB blok offer nyatakan TEPAT apa dalam produk (bab/modul/audio/bonus + nilai). '
             . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Simpan butiran/penerangan panjang dalam body, BUKAN dalam headline. Headline = pukulan, body = cerita.';
     }
 
@@ -544,6 +552,15 @@ TXT;
                 'bullets' => ['Dah cuba pelbagai cara tapi tak kekal', 'Buang duit pada benda yang tak menjadi', 'Rasa macam tiada jalan keluar']],
             ['type' => 'agitate', 'label' => $L['agitate'], 'headline' => 'Kalau dibiarkan, ia jadi lebih teruk',
                 'body' => 'Makin lama ditangguh, makin susah nak pulih. Bukan setakat masa & duit — keyakinan diri pun terjejas. Tapi ia tak perlu jadi begitu.'],
+            ['type' => 'listicle', 'label' => $L['listicle'], 'headline' => '5 Silap Yang Ramai Buat Tanpa Sedar',
+                'body' => 'Sebelum kita masuk penyelesaian — kenali dulu punca sebenar. Nombor 5 paling ramai terlepas.',
+                'items' => [
+                    ['q' => 'Ingat semua cara sama sahaja', 'a' => 'Sebab tu dah cuba banyak benda tapi tak menjadi — asasnya tak kena dari mula.'],
+                    ['q' => 'Belajar berterabur, tiada susunan', 'a' => 'Tangkap sikit sana sini, akhirnya keliru dan cepat lupa.'],
+                    ['q' => 'Tiada orang betulkan kesilapan', 'a' => 'Belajar sendiri buat silap yang sama berulang tanpa sedar.'],
+                    ['q' => 'Tangguh sebab rasa "nanti-nanti"', 'a' => 'Makin lama ditangguh, makin hilang momentum & keyakinan.'],
+                    ['q' => 'Fikir ia rumit & bukan untuk saya', 'a' => 'Padahal dengan panduan yang betul, ia jauh lebih mudah daripada yang disangka.'],
+                ]],
             ['type' => 'solution', 'label' => $L['solution'], 'headline' => "Perkenalkan {$name}",
                 'body' => "{$benefits}. Mekanisme uniknya buat ia berkesan walaupun cara lain dah gagal.",
                 'bullets' => array_map('trim', explode(',', $benefits))],

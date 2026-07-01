@@ -73,7 +73,7 @@
                 <section class="{{ $T['sectionBg'] }} px-6 pb-10 pt-6 text-center">
                     <span class="text-4xl">{{ $painEmoji[0] }}</span>
                     <h2 class="font-display mx-auto mt-3 max-w-[18ch] text-[1.7rem] font-black leading-tight tracking-tight {{ $T['emoHead'] }}">{{ $b['headline'] ?? '' }}</h2>
-                    @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[40ch] text-sm leading-relaxed text-ink-soft">{!! $hl($b['body']) !!}</p>@endif
+                    @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{!! $hl($b['body']) !!}</p>@endif
                     @if (! empty($b['image']))<div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3 text-left">
@@ -89,7 +89,7 @@
                 <section class="{{ $T['sectionBg'] }} px-6 pb-10 pt-2 text-center">
                     <span class="text-4xl">⚠️</span>
                     <h2 class="font-display mx-auto mt-3 max-w-[22ch] text-[1.6rem] font-black leading-tight tracking-tight {{ $T['emoHead'] }}">{{ $b['headline'] ?? '' }}</h2>
-                    <p class="mx-auto mt-3 max-w-[40ch] text-sm leading-relaxed text-ink-soft">{!! $hl($b['body'] ?? '') !!}</p>
+                    <p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{!! $hl($b['body'] ?? '') !!}</p>
                     @if (! empty($b['image']))<div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3 text-left">
@@ -99,11 +99,30 @@
                 </section>
                 @break
 
+            @case('listicle')
+                <section class="px-6 py-11">
+                    <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Buka mata</p>
+                    <h2 class="font-display mx-auto mt-2 max-w-[20ch] text-center text-[1.7rem] font-black leading-tight tracking-tight {{ $T['emoHead'] }}">{{ $b['headline'] ?? '' }}</h2>
+                    @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[44ch] text-center text-[0.95rem] leading-relaxed text-ink-soft">{!! $hl($b['body']) !!}</p>@endif
+                    <ol class="mx-auto mt-7 max-w-md space-y-3">
+                        @foreach ($b['items'] ?? [] as $i => $it)
+                            <li class="flex gap-4 rounded-[var(--radius-lg)] border border-border bg-surface p-4 shadow-sm">
+                                <span class="font-display flex size-9 shrink-0 items-center justify-center rounded-full text-lg font-black shadow-sm {{ $T['cta'] }}">{{ $i + 1 }}</span>
+                                <div class="min-w-0 pt-0.5">
+                                    <p class="font-bold leading-snug text-ink">{{ $it['q'] ?? '' }}</p>
+                                    @if (! empty($it['a']))<p class="mt-1 text-sm leading-relaxed text-ink-soft">{{ $it['a'] }}</p>@endif
+                                </div>
+                            </li>
+                        @endforeach
+                    </ol>
+                </section>
+                @break
+
             @case('solution')
                 <section class="px-6 py-10">
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Penyelesaiannya</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.7rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
-                    <p class="mx-auto mt-3 max-w-[40ch] text-center text-sm leading-relaxed text-ink-soft">{{ $b['body'] ?? '' }}</p>
+                    <p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{{ $b['body'] ?? '' }}</p>
                     @if (! empty($b['image']))<div class="mx-auto mt-6 max-w-sm overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $b['image'] }}" alt="" class="w-full object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <ul class="mx-auto mt-6 grid max-w-md gap-2.5">@foreach ($b['bullets'] as $bl)<li class="flex items-start gap-3 text-sm"><span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-success/15 text-success"><x-lucide-check class="size-3" /></span><span class="text-ink-soft">{{ $bl }}</span></li>@endforeach</ul>

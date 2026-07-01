@@ -44,7 +44,7 @@
         elseif (preg_match('~vimeo\.com/(\d+)~', $video, $m)) $embed = 'https://player.vimeo.com/video/' . $m[1];
     }
 @endphp
-<div class="bg-bg text-ink">
+<div class="bg-bg text-ink sp-page">
     <div class="{{ $T['banner'] }} px-4 py-2 text-center text-xs font-bold tracking-wide">🔥 {{ \Illuminate\Support\Str::limit($urgencyText ?: 'Stok terhad — dapatkan sekarang sebelum harga naik!', 64) }}</div>
 
     @foreach ($blocks as $b)
@@ -249,4 +249,28 @@
     @if (count($gallery))<div class="scroll-thin flex gap-2.5 overflow-x-auto px-6 py-4">@foreach ($gallery as $img)<img src="{{ $img }}" class="size-24 shrink-0 rounded-[var(--radius-lg)] border border-border object-cover" alt="">@endforeach</div>@endif
 
     <footer class="border-t border-border px-6 py-6 text-center"><div class="flex items-center justify-center gap-4 text-[0.7rem] text-muted"><span class="flex items-center gap-1"><x-lucide-lock class="size-3.5" /> SSL Selamat</span><span class="flex items-center gap-1"><x-lucide-credit-card class="size-3.5" /> FPX · DuitNow · COD</span></div><p class="mt-3 text-xs text-muted">© {{ date('Y') }} · Dikuasakan oleh <span class="font-semibold text-ink">Mendap</span></p></footer>
+
+    {{-- Reveal-on-scroll polish. Content is ALWAYS visible by default; the fade only applies once JS confirms support, with a 2.2s failsafe so nothing can ever stay hidden. --}}
+    <style>
+        .js-anim .sp-page > section { opacity: 0; transform: translateY(18px); transition: opacity .55s ease, transform .55s ease; }
+        .js-anim .sp-page > section.in { opacity: 1; transform: none; }
+        @media (prefers-reduced-motion: reduce) { .js-anim .sp-page > section { opacity: 1 !important; transform: none !important; } }
+    </style>
+    <script>
+    (function () {
+        try {
+            if (!('IntersectionObserver' in window)) return;
+            var root = document.querySelector('.sp-page');
+            if (!root) return;
+            var secs = root.querySelectorAll(':scope > section');
+            if (!secs.length) return;
+            document.documentElement.classList.add('js-anim');
+            var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+            }, { rootMargin: '0px 0px -8% 0px' });
+            secs.forEach(function (s) { io.observe(s); });
+            setTimeout(function () { secs.forEach(function (s) { s.classList.add('in'); }); }, 2200); // failsafe
+        } catch (e) {}
+    })();
+    </script>
 </div>

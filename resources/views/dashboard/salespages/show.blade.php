@@ -124,6 +124,27 @@
                     </form>
                 </x-ui.card-body>
             </x-ui.card>
+            <x-ui.card>
+                <x-ui.card-header title="Order Bump (upsell checkout)" subtitle="Tawaran tambahan 1-klik semasa checkout — cara paling mudah naikkan purata nilai jualan" />
+                <x-ui.card-body>
+                    <form method="POST" action="{{ route('salespages.update', $salespage) }}" class="max-w-2xl space-y-5" x-data="{ on: {{ $salespage->bump_enabled ? 'true' : 'false' }} }">@csrf @method('PUT')
+                        <input type="hidden" name="title" value="{{ $salespage->title }}">
+                        <input type="hidden" name="price" value="{{ $salespage->price }}">
+                        <input type="hidden" name="compare_price" value="{{ $salespage->compare_price }}">
+                        <input type="hidden" name="gateway" value="{{ $salespage->gateway }}">
+                        <label class="flex items-center gap-3">
+                            <input type="checkbox" name="bump_enabled" value="1" x-model="on" class="size-5 accent-primary">
+                            <span class="text-sm font-medium text-ink">Aktifkan order bump di checkout</span>
+                        </label>
+                        <div x-show="on" x-cloak class="space-y-5 border-l-2 border-primary/30 pl-4">
+                            <x-ui.field label="Tajuk tawaran" hint="apa yang pembeli dapat"><x-ui.input name="bump_title" value="{{ $salespage->bump_title }}" placeholder="cth. Tambah Audio MP3 Tajwid" /></x-ui.field>
+                            <x-ui.field label="Penerangan ringkas"><x-ui.input name="bump_desc" value="{{ $salespage->bump_desc }}" placeholder="cth. Dengar sebutan betul, latih telinga di mana-mana" /></x-ui.field>
+                            <x-ui.field label="Harga tambahan (RM)"><x-ui.input name="bump_price" type="number" step="0.01" value="{{ $salespage->bump_price }}" placeholder="19.00" /></x-ui.field>
+                        </div>
+                        <x-ui.button type="submit">Simpan order bump</x-ui.button>
+                    </form>
+                </x-ui.card-body>
+            </x-ui.card>
         </div>
 
         {{-- Analytics --}}

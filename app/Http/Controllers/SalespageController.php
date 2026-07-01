@@ -56,7 +56,15 @@ class SalespageController extends Controller
             'tiktok_pixel' => 'nullable|string|max:50',
             'ga_id' => 'nullable|string|max:50',
             'offer_ends_at' => 'nullable|date',
+            'bump_enabled' => 'nullable|boolean',
+            'bump_title' => 'nullable|string|max:120',
+            'bump_desc' => 'nullable|string|max:200',
+            'bump_price' => 'nullable|numeric|min:0',
         ]);
+        // Checkboxes only submit when checked — normalise to an explicit boolean when the bump form is posted.
+        if ($request->has('bump_enabled') || $request->has('bump_title') || $request->has('bump_price')) {
+            $data['bump_enabled'] = $request->boolean('bump_enabled');
+        }
         $salespage->update($data);
 
         return back()->with('ok', 'Salespage dikemas kini.');

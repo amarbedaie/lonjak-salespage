@@ -39,6 +39,7 @@ class PublicController extends Controller
             'state' => 'required|string|max:100',
             'qty' => 'required|integer|min:1|max:99',
             'coupon_code' => 'nullable|string|max:50',
+            'bump' => 'nullable|boolean',
         ]);
 
         // Apply coupon (server-authoritative).
@@ -54,6 +55,14 @@ class PublicController extends Controller
             }
         }
 
+        // Order bump (add-on) — only if enabled on this salespage & the buyer opted in.
+        $bumpTitle = null;
+        $bumpPrice = 0.0;
+        if (! empty($data['bump']) && $salespage->bump_enabled && $salespage->bump_price > 0) {
+            $bumpTitle = $salespage->bump_title ?: 'Tambahan';
+            $bumpPrice = (float) $salespage->bump_price;
+        }
+
         $order = Order::create([
             'user_id' => $salespage->user_id,
             'salespage_id' => $salespage->id,
@@ -64,9 +73,11 @@ class PublicController extends Controller
             'state' => $data['state'],
             'product_name' => $salespage->product_name,
             'qty' => $data['qty'],
-            'total' => max(0, $subtotal - $discount),
+            'total' => max(0, $subtotal - $discount) + $bumpPrice,
             'coupon_code' => $couponCode,
             'discount' => $discount,
+            'bump_title' => $bumpTitle,
+            'bump_price' => $bumpPrice,
             'status' => 'baru',
             'payment_status' => 'belum',
         ]);

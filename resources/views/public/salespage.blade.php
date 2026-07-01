@@ -49,8 +49,9 @@
                 @else
                     <form method="POST" action="{{ route('salespage.order', $salespage->slug) }}" class="space-y-4" x-data="{
                         qty: 1, unit: {{ $price }}, coupon: '', applied: '', discount: 0, msg: '', busy: false,
+                        bump: false, bumpPrice: {{ (float) ($salespage->bump_price ?? 0) }},
                         get subtotal() { return this.unit * this.qty },
-                        get total() { return Math.max(0, this.subtotal - this.discount) },
+                        get total() { return Math.max(0, this.subtotal - this.discount) + (this.bump ? this.bumpPrice : 0) },
                         async apply() {
                             if (! this.coupon.trim()) return;
                             this.busy = true; this.msg = '';
@@ -106,10 +107,23 @@
                             <input type="hidden" name="coupon_code" :value="applied">
                         </div>
 
+                        {{-- Order bump (tawaran tambahan) --}}
+                        @if ($salespage->bump_enabled && (float) $salespage->bump_price > 0)
+                            <label class="flex cursor-pointer items-start gap-3 rounded-[var(--radius-md)] border-2 border-dashed border-primary/50 bg-primary/5 p-3.5 transition-colors" :class="bump && '!border-solid border-primary bg-primary/10'">
+                                <input type="checkbox" name="bump" value="1" x-model="bump" class="mt-0.5 size-5 shrink-0 accent-primary" />
+                                <span class="min-w-0 flex-1">
+                                    <span class="flex items-center gap-1.5 text-sm font-bold text-ink"><x-lucide-circle-plus class="size-4 shrink-0 text-primary" /> {{ $salespage->bump_title ?: 'Tambah pakej istimewa' }}</span>
+                                    @if ($salespage->bump_desc)<span class="mt-0.5 block text-xs leading-relaxed text-ink-soft">{{ $salespage->bump_desc }}</span>@endif
+                                    <span class="mt-1 block text-sm font-extrabold text-primary">+ RM{{ number_format((float) $salespage->bump_price, 2) }}</span>
+                                </span>
+                            </label>
+                        @endif
+
                         {{-- Ringkasan harga --}}
                         <div class="space-y-1 rounded-[var(--radius-md)] border border-border bg-muted-surface/50 px-4 py-3 text-sm">
                             <div class="flex justify-between text-ink-soft"><span>Subtotal (<span x-text="qty"></span> unit)</span><span class="tnum" x-text="'RM' + subtotal.toFixed(2)"></span></div>
                             <div x-show="discount > 0" x-cloak class="flex justify-between text-success"><span>Diskaun</span><span class="tnum">−RM<span x-text="discount.toFixed(2)"></span></span></div>
+                            <div x-show="bump" x-cloak class="flex justify-between text-ink-soft"><span>{{ $salespage->bump_title ?: 'Tambahan' }}</span><span class="tnum">+RM<span x-text="bumpPrice.toFixed(2)"></span></span></div>
                             <div class="flex justify-between border-t border-border pt-1.5 text-base font-bold text-ink"><span>Jumlah</span><span class="tnum" x-text="'RM' + total.toFixed(2)"></span></div>
                         </div>
 

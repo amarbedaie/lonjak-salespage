@@ -222,6 +222,8 @@ class Builder extends Component
                 'problem' => $this->problem, 'benefits' => $this->benefits, 'tone' => $this->tone,
             ],
             'blocks' => $this->page,
+            'variants' => $this->variants,
+            'variant_index' => $this->selectedVariant,
             'images' => $this->images,
             'video_url' => $this->videoUrl,
         ]);

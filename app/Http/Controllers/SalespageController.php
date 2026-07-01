@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Salespage;
+use App\Services\SalespageGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -89,6 +90,34 @@ class SalespageController extends Controller
         $copy->save();
 
         return redirect()->route('salespages.show', $copy)->with('ok', 'Salespage diduplikasi sebagai draf baharu.');
+    }
+
+    /** Switch which generated variant is the live one (places media on first use). */
+    public function setVariant(Salespage $salespage, Request $request, SalespageGenerator $gen)
+    {
+        $this->authorizeOwner($salespage);
+        $i = (int) $request->input('index', 0);
+        $variants = $salespage->variants ?? [];
+        if (! isset($variants[$i])) {
+            return back();
+        }
+
+        $page = $variants[$i];
+        // First time this variant is chosen, run the AI media director so it looks complete.
+        $hasImage = collect($page['blocks'] ?? [])->contains(fn ($b) => ! empty($b['image']));
+        if (! $hasImage) {
+            $page = $gen->directMedia($page, $salespage->images ?? [], $salespage->video_url);
+            $variants[$i] = $page;
+        }
+
+        $salespage->update([
+            'blocks' => $page,
+            'variants' => $variants,
+            'variant_index' => $i,
+            'theme' => $page['theme'] ?? $salespage->theme,
+        ]);
+
+        return back()->with('ok', 'Variasi '.($i + 1).' kini aktif & dipaparkan.');
     }
 
     private function authorizeOwner(Salespage $salespage): void

@@ -45,7 +45,32 @@
         </div>
 
         {{-- Design --}}
-        <div x-show="tab==='design'" class="grid gap-6 lg:grid-cols-5">
+        <div x-show="tab==='design'" class="space-y-6">
+            @if (is_array($salespage->variants) && count($salespage->variants) > 1)
+                <x-ui.card>
+                    <x-ui.card-header title="Variasi AI" subtitle="{{ count($salespage->variants) }} versi dijana — pilih yang nak jadi LIVE (pengunjung nampak yang aktif sahaja)" />
+                    <x-ui.card-body class="flex flex-wrap gap-2.5">
+                        @foreach ($salespage->variants as $i => $v)
+                            @php
+                                $vhero = collect($v['blocks'] ?? [])->firstWhere('type', 'hero');
+                                $vhl = $vhero['headline'] ?? ('Variasi '.($i + 1));
+                                $active = (int) $salespage->variant_index === $i;
+                            @endphp
+                            <form method="POST" action="{{ route('salespages.variant', $salespage) }}">@csrf
+                                <input type="hidden" name="index" value="{{ $i }}">
+                                <button type="submit" class="flex w-[210px] items-center gap-2.5 rounded-[var(--radius-md)] border px-3 py-2.5 text-left transition {{ $active ? 'border-primary bg-primary/5' : 'border-border hover:bg-muted-surface' }}">
+                                    <span class="flex size-7 shrink-0 items-center justify-center rounded-full text-sm font-bold {{ $active ? 'bg-primary text-primary-fg' : 'bg-muted-surface text-muted' }}">{{ $i + 1 }}</span>
+                                    <span class="min-w-0 flex-1">
+                                        <span class="block truncate text-sm font-medium text-ink">{{ \Illuminate\Support\Str::limit($vhl, 30) }}</span>
+                                        <span class="text-xs {{ $active ? 'font-medium text-primary' : 'text-muted' }}">{{ $active ? '● Aktif (live)' : 'Klik untuk guna' }}</span>
+                                    </span>
+                                </button>
+                            </form>
+                        @endforeach
+                    </x-ui.card-body>
+                </x-ui.card>
+            @endif
+            <div class="grid gap-6 lg:grid-cols-5">
             <x-ui.card class="lg:col-span-2">
                 <x-ui.card-header title="Blok salespage" subtitle="Susunan 12-blok direct-response" />
                 <x-ui.card-body class="space-y-1.5">
@@ -65,6 +90,7 @@
                         </div>
                     </x-ui.card-body>
                 </x-ui.card>
+            </div>
             </div>
         </div>
 

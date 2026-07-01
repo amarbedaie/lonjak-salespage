@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-#[Fillable(['user_id', 'title', 'slug', 'product_name', 'price', 'compare_price', 'category', 'theme', 'status', 'gateway', 'brief', 'blocks', 'images', 'video_url', 'visits', 'fb_pixel', 'tiktok_pixel', 'ga_id', 'offer_ends_at', 'bump_enabled', 'bump_title', 'bump_desc', 'bump_price'])]
+#[Fillable(['user_id', 'title', 'slug', 'product_name', 'price', 'compare_price', 'category', 'theme', 'status', 'gateway', 'brief', 'blocks', 'variants', 'variant_index', 'images', 'video_url', 'visits', 'fb_pixel', 'tiktok_pixel', 'ga_id', 'offer_ends_at', 'bump_enabled', 'bump_title', 'bump_desc', 'bump_price'])]
 class Salespage extends Model
 {
     protected function casts(): array
@@ -15,6 +15,7 @@ class Salespage extends Model
         return [
             'brief' => 'array',
             'blocks' => 'array',
+            'variants' => 'array',
             'images' => 'array',
             'price' => 'decimal:2',
             'compare_price' => 'decimal:2',

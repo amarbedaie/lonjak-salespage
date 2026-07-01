@@ -52,6 +52,7 @@ Route::middleware(['auth', 'not.suspended'])->prefix('dashboard')->group(functio
     Route::put('/salespages/{salespage}', [SalespageController::class, 'update'])->name('salespages.update');
     Route::delete('/salespages/{salespage}', [SalespageController::class, 'destroy'])->name('salespages.destroy');
     Route::post('/salespages/{salespage}/duplicate', [SalespageController::class, 'duplicate'])->name('salespages.duplicate');
+    Route::post('/salespages/{salespage}/variant', [SalespageController::class, 'setVariant'])->name('salespages.variant');
 
     Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/export', [OrderController::class, 'export'])->name('orders.export');

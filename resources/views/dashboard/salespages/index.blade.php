@@ -34,9 +34,14 @@
                                     <td class="px-5 py-3.5 text-right font-medium text-ink tnum">{{ $rm($a['revenue']) }}</td>
                                     <td class="px-5 py-3.5 text-xs text-muted">{{ $s->updated_at->translatedFormat('d M Y') }}</td>
                                     <td class="px-5 py-3.5">
-                                        @if ($s->status === 'live')
-                                            <a href="{{ url('/s/'.$s->slug) }}" target="_blank" class="inline-flex size-7 items-center justify-center rounded-md text-muted opacity-0 transition-opacity hover:bg-bg hover:text-ink group-hover:opacity-100"><x-lucide-external-link class="size-4" /></a>
-                                        @endif
+                                        <div class="flex items-center justify-end gap-1">
+                                            @if ($s->status === 'live')
+                                                <a href="{{ url('/s/'.$s->slug) }}" target="_blank" title="Buka" class="inline-flex size-7 items-center justify-center rounded-md text-muted opacity-0 transition-opacity hover:bg-bg hover:text-ink group-hover:opacity-100"><x-lucide-external-link class="size-4" /></a>
+                                            @endif
+                                            <form method="POST" action="{{ route('salespages.duplicate', $s) }}">@csrf
+                                                <button type="submit" title="Duplikasi" class="inline-flex size-7 items-center justify-center rounded-md text-muted opacity-0 transition-opacity hover:bg-bg hover:text-ink group-hover:opacity-100"><x-lucide-copy class="size-4" /></button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

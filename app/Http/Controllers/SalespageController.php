@@ -78,6 +78,19 @@ class SalespageController extends Controller
         return redirect()->route('salespages.index');
     }
 
+    public function duplicate(Salespage $salespage)
+    {
+        $this->authorizeOwner($salespage);
+        $copy = $salespage->replicate(['visits']);
+        $copy->title = $salespage->title.' (salinan)';
+        $copy->slug = \Illuminate\Support\Str::slug($salespage->title).'-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(4));
+        $copy->status = 'draf';
+        $copy->visits = 0;
+        $copy->save();
+
+        return redirect()->route('salespages.show', $copy)->with('ok', 'Salespage diduplikasi sebagai draf baharu.');
+    }
+
     private function authorizeOwner(Salespage $salespage): void
     {
         abort_unless($salespage->user_id === Auth::id(), 403);

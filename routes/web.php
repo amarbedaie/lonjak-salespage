@@ -28,6 +28,7 @@ Route::view('/suspended', 'suspended')->name('suspended');
 // Public salespage + checkout
 Route::get('/s/{slug}', [PublicController::class, 'show'])->name('salespage.public');
 Route::post('/s/{slug}/order', [PublicController::class, 'order'])->name('salespage.order');
+Route::post('/s/{slug}/coupon', [PublicController::class, 'validateCoupon'])->name('salespage.coupon');
 
 // BayarCash payment callbacks
 Route::match(['get', 'post'], '/payment/return', [\App\Http\Controllers\PaymentController::class, 'return'])->name('payment.return');

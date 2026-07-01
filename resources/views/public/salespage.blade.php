@@ -47,7 +47,26 @@
                         <p class="mt-1 text-sm text-ink-soft">Terima kasih. Kami akan WhatsApp anda untuk pengesahan & pembayaran.</p>
                     </div>
                 @else
-                    <form method="POST" action="{{ route('salespage.order', $salespage->slug) }}" class="space-y-4" x-data="{ qty: 1 }">@csrf
+                    <form method="POST" action="{{ route('salespage.order', $salespage->slug) }}" class="space-y-4" x-data="{
+                        qty: 1, unit: {{ $price }}, coupon: '', applied: '', discount: 0, msg: '', busy: false,
+                        get subtotal() { return this.unit * this.qty },
+                        get total() { return Math.max(0, this.subtotal - this.discount) },
+                        async apply() {
+                            if (! this.coupon.trim()) return;
+                            this.busy = true; this.msg = '';
+                            try {
+                                const r = await fetch('{{ route('salespage.coupon', $salespage->slug) }}', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                                    body: JSON.stringify({ code: this.coupon, qty: this.qty }),
+                                });
+                                const d = await r.json();
+                                if (d.valid) { this.discount = d.discount; this.applied = d.code; this.msg = ''; }
+                                else { this.discount = 0; this.applied = ''; this.msg = d.message || 'Kod tidak sah.'; }
+                            } catch (e) { this.msg = 'Ralat rangkaian. Cuba lagi.'; }
+                            this.busy = false;
+                        },
+                    }" x-init="$watch('qty', () => { if (applied) apply() })">@csrf
                         <div class="flex items-center justify-between rounded-[var(--radius-md)] border border-border bg-surface px-4 py-3">
                             <div><p class="text-sm font-medium text-ink">{{ $salespage->product_name ?: $salespage->title }}</p><p class="text-xs text-muted">RM{{ number_format($price, 2) }} / unit</p></div>
                             <div class="flex items-center gap-2">
@@ -68,8 +87,34 @@
                                 @foreach ($states as $s)<option>{{ $s }}</option>@endforeach
                             </x-ui.select>
                         </x-ui.field>
+
+                        {{-- Kupon diskaun --}}
+                        <div>
+                            <label class="mb-1.5 block text-sm font-medium text-ink">Kod diskaun <span class="font-normal text-muted">(pilihan)</span></label>
+                            <div class="flex gap-2">
+                                <input type="text" x-model="coupon" @keydown.enter.prevent="apply()" placeholder="cth. RAYA10"
+                                    :disabled="applied"
+                                    class="h-11 flex-1 rounded-[var(--radius-md)] border border-border bg-surface px-3.5 text-sm uppercase tracking-wide text-ink placeholder:normal-case placeholder:tracking-normal placeholder:text-muted focus:border-primary focus:outline-none disabled:opacity-60" />
+                                <button type="button" @click="applied ? (applied='', discount=0, coupon='', msg='') : apply()" :disabled="busy"
+                                    class="h-11 shrink-0 rounded-[var(--radius-md)] border border-primary px-4 text-sm font-semibold text-primary hover:bg-primary/5 disabled:opacity-50"
+                                    x-text="applied ? 'Buang' : (busy ? '...' : 'Guna')"></button>
+                            </div>
+                            <p x-show="msg" x-cloak class="mt-1.5 text-xs text-danger" x-text="msg"></p>
+                            <p x-show="applied" x-cloak class="mt-1.5 flex items-center gap-1 text-xs font-medium text-success">
+                                <x-lucide-badge-check class="size-3.5" /> Kod <span class="font-bold" x-text="applied"></span> digunakan — jimat RM<span x-text="discount.toFixed(2)"></span>
+                            </p>
+                            <input type="hidden" name="coupon_code" :value="applied">
+                        </div>
+
+                        {{-- Ringkasan harga --}}
+                        <div class="space-y-1 rounded-[var(--radius-md)] border border-border bg-muted-surface/50 px-4 py-3 text-sm">
+                            <div class="flex justify-between text-ink-soft"><span>Subtotal (<span x-text="qty"></span> unit)</span><span class="tnum" x-text="'RM' + subtotal.toFixed(2)"></span></div>
+                            <div x-show="discount > 0" x-cloak class="flex justify-between text-success"><span>Diskaun</span><span class="tnum">−RM<span x-text="discount.toFixed(2)"></span></span></div>
+                            <div class="flex justify-between border-t border-border pt-1.5 text-base font-bold text-ink"><span>Jumlah</span><span class="tnum" x-text="'RM' + total.toFixed(2)"></span></div>
+                        </div>
+
                         <button type="submit" class="flex w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-primary px-6 py-3.5 text-base font-semibold text-primary-fg shadow-lg shadow-primary/20">
-                            Sahkan Order — <span x-text="'RM' + ({{ $price }} * qty).toFixed(2)"></span>
+                            Sahkan Order — <span x-text="'RM' + total.toFixed(2)"></span>
                         </button>
                         <p class="flex items-center justify-center gap-1.5 text-xs text-muted"><x-lucide-shield-check class="size-3.5 text-success" /> Bayaran selamat · COD tersedia</p>
                     </form>

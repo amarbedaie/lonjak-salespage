@@ -198,7 +198,7 @@ TXT;
             $sys = $this->systemPrompt();
             $userPrompt = $this->prompt($brief);
             $responses = Http::pool(fn ($pool) => array_map(
-                fn ($angle) => $pool->withToken($key)->withHeaders(['X-Title' => 'Mendap'])->timeout(120)
+                fn ($angle) => $pool->withToken($key)->withHeaders(['X-Title' => 'Mendap'])->timeout(240)
                     ->post('https://openrouter.ai/api/v1/chat/completions', [
                         'model' => $model,
                         'max_tokens' => 16000,

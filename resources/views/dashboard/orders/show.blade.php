@@ -5,6 +5,8 @@
         $unit = $order->qty > 0 ? $subtotal / $order->qty : $subtotal;
         $digits = preg_replace('/\D/', '', $order->phone);
         $wa = str_starts_with($digits, '60') ? $digits : '60'.ltrim($digits, '0');
+        $hasEP = ! empty(auth()->user()->easyparcel_api_key);
+        $destPostcode = preg_match('/\b(\d{5})\b/', $order->address, $mm) ? $mm[1] : '';
     @endphp
     <div class="mx-auto max-w-4xl space-y-6">
         @if (session('ok'))
@@ -85,5 +87,64 @@
                 </x-ui.card>
             </div>
         </div>
+
+        {{-- Penghantaran (EasyParcel) --}}
+        <x-ui.card>
+            <x-ui.card-header title="Penghantaran">
+                <x-slot:action>@if ($order->awb)<x-ui.badge tone="success">Ditempah</x-ui.badge>@endif</x-slot:action>
+            </x-ui.card-header>
+            <x-ui.card-body>
+                @error('ship')<p class="mb-3 rounded-[var(--radius-md)] border border-danger/30 bg-danger-soft px-3 py-2 text-sm text-danger">{{ $message }}</p>@enderror
+                @if ($order->awb)
+                    <div class="grid gap-3 text-sm sm:grid-cols-2">
+                        <div><p class="text-xs text-muted">Kurier</p><p class="font-medium text-ink">{{ $order->courier ?: '—' }}</p></div>
+                        <div><p class="text-xs text-muted">No. AWB</p><p class="font-mono text-ink">{{ $order->awb }}</p></div>
+                        @if ($order->ship_price)<div><p class="text-xs text-muted">Kos hantar</p><p class="text-ink">RM{{ number_format((float) $order->ship_price, 2) }}</p></div>@endif
+                        @if ($order->ship_weight)<div><p class="text-xs text-muted">Berat</p><p class="text-ink">{{ rtrim(rtrim(number_format((float) $order->ship_weight, 2), '0'), '.') }} kg</p></div>@endif
+                    </div>
+                    <div class="mt-4 flex flex-wrap gap-2">
+                        @if ($order->awb_link)<a href="{{ $order->awb_link }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-primary px-3.5 py-2 text-sm font-semibold text-primary-fg hover:opacity-90"><x-lucide-printer class="size-4" /> Cetak label</a>@endif
+                        @if ($order->tracking_url)<a href="{{ $order->tracking_url }}" target="_blank" class="inline-flex items-center gap-1.5 rounded-[var(--radius-md)] border border-border px-3.5 py-2 text-sm font-medium text-ink-soft hover:bg-muted-surface"><x-lucide-map-pin class="size-4" /> Jejak parcel</a>@endif
+                    </div>
+                @elseif ($hasEP)
+                    <div x-data="{ weight: 1, postcode: '{{ $destPostcode }}', rates: [], selected: '', loading: false, error: '', booking: false,
+                        async check() {
+                            this.loading = true; this.error = ''; this.rates = []; this.selected = '';
+                            try {
+                                const r = await fetch('{{ route('orders.rates', $order) }}', { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' }, body: JSON.stringify({ weight: this.weight, postcode: this.postcode }) });
+                                const d = await r.json();
+                                if (d.ok) { this.rates = d.rates; if (! d.rates.length) this.error = 'Tiada kurier untuk destinasi ini.'; } else { this.error = d.error; }
+                            } catch (e) { this.error = 'Ralat rangkaian. Cuba lagi.'; }
+                            this.loading = false;
+                        } }">
+                        <div class="flex flex-wrap items-end gap-3">
+                            <div><label class="mb-1 block text-xs text-muted">Berat (kg)</label><input type="number" step="0.1" min="0.1" x-model.number="weight" class="h-10 w-24 rounded-[var(--radius-md)] border border-border bg-bg px-3 text-sm text-ink focus:border-primary focus:outline-none"></div>
+                            <div><label class="mb-1 block text-xs text-muted">Poskod destinasi</label><input type="text" x-model="postcode" placeholder="43000" class="h-10 w-32 rounded-[var(--radius-md)] border border-border bg-bg px-3 text-sm text-ink focus:border-primary focus:outline-none"></div>
+                            <button type="button" @click="check()" :disabled="loading" class="h-10 rounded-[var(--radius-md)] border border-primary px-4 text-sm font-semibold text-primary hover:bg-primary/5 disabled:opacity-50" x-text="loading ? 'Menyemak…' : 'Semak kadar'"></button>
+                        </div>
+                        <p x-show="error" x-cloak class="mt-2 text-sm text-danger" x-text="error"></p>
+                        <div x-show="rates.length" x-cloak class="mt-4 space-y-2">
+                            <template x-for="r in rates" :key="r.service_id">
+                                <label class="flex cursor-pointer items-center gap-3 rounded-[var(--radius-md)] border border-border p-3 text-sm" :class="selected === r.service_id && '!border-primary bg-primary/5'">
+                                    <input type="radio" name="svc" :value="r.service_id" x-model="selected" class="accent-primary">
+                                    <span class="min-w-0 flex-1"><span class="font-medium text-ink" x-text="r.courier"></span> <span class="text-xs text-muted" x-text="r.delivery"></span></span>
+                                    <span class="shrink-0 font-bold text-ink">RM<span x-text="r.price.toFixed(2)"></span></span>
+                                </label>
+                            </template>
+                            <form method="POST" action="{{ route('orders.book', $order) }}" @submit="booking = true">@csrf
+                                <input type="hidden" name="service_id" :value="selected">
+                                <input type="hidden" name="weight" :value="weight">
+                                <input type="hidden" name="postcode" :value="postcode">
+                                <button type="submit" :disabled="! selected || booking" class="mt-2 inline-flex items-center gap-1.5 rounded-[var(--radius-md)] bg-primary px-4 py-2.5 text-sm font-semibold text-primary-fg hover:opacity-90 disabled:opacity-50"><x-lucide-truck class="size-4" /> <span x-text="booking ? 'Menempah…' : 'Book & bayar penghantaran'"></span></button>
+                            </form>
+                        </div>
+                    </div>
+                @else
+                    <div class="rounded-[var(--radius-md)] bg-muted-surface/60 px-4 py-3 text-sm text-ink-soft">
+                        Sambung <a href="{{ route('shipping') }}" class="font-medium text-primary hover:underline">EasyParcel</a> untuk semak kadar, tempah kurier & jana AWB terus dari sini.
+                    </div>
+                @endif
+            </x-ui.card-body>
+        </x-ui.card>
     </div>
 </x-layouts.app>

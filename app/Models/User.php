@@ -10,8 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'business_name', 'phone', 'email', 'password', 'role', 'plan', 'ai_credits', 'status', 'bayarcash_pat', 'bayarcash_portal_key', 'bayarcash_api_secret', 'bayarcash_sandbox', 'bayarcash_active'])]
-#[Hidden(['password', 'remember_token', 'bayarcash_pat', 'bayarcash_api_secret'])]
+#[Fillable(['name', 'business_name', 'phone', 'email', 'password', 'role', 'plan', 'ai_credits', 'status', 'bayarcash_pat', 'bayarcash_portal_key', 'bayarcash_api_secret', 'bayarcash_sandbox', 'bayarcash_active', 'easyparcel_api_key', 'easyparcel_sandbox', 'ship_name', 'ship_phone', 'ship_addr1', 'ship_addr2', 'ship_city', 'ship_state', 'ship_postcode'])]
+#[Hidden(['password', 'remember_token', 'bayarcash_pat', 'bayarcash_api_secret', 'easyparcel_api_key'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
@@ -27,6 +27,8 @@ class User extends Authenticatable
             'bayarcash_api_secret' => 'encrypted',
             'bayarcash_sandbox' => 'boolean',
             'bayarcash_active' => 'boolean',
+            'easyparcel_api_key' => 'encrypted',
+            'easyparcel_sandbox' => 'boolean',
         ];
     }
 

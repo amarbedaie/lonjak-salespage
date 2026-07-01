@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['user_id', 'salespage_id', 'customer', 'email', 'phone', 'address', 'state', 'product_name', 'qty', 'total', 'coupon_code', 'discount', 'bump_title', 'bump_price', 'status', 'courier', 'awb', 'payment_status', 'payment_ref'])]
+#[Fillable(['user_id', 'salespage_id', 'customer', 'email', 'phone', 'address', 'state', 'product_name', 'qty', 'total', 'coupon_code', 'discount', 'bump_title', 'bump_price', 'status', 'courier', 'awb', 'ep_order_no', 'awb_link', 'tracking_url', 'ship_price', 'ship_weight', 'payment_status', 'payment_ref'])]
 class Order extends Model
 {
     protected function casts(): array
@@ -15,6 +15,8 @@ class Order extends Model
             'total' => 'decimal:2',
             'discount' => 'decimal:2',
             'bump_price' => 'decimal:2',
+            'ship_price' => 'decimal:2',
+            'ship_weight' => 'decimal:2',
         ];
     }
 

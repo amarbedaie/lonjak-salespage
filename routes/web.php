@@ -30,6 +30,13 @@ Route::get('/s/{slug}', [PublicController::class, 'show'])->name('salespage.publ
 Route::post('/s/{slug}/order', [PublicController::class, 'order'])->name('salespage.order');
 Route::post('/s/{slug}/coupon', [PublicController::class, 'validateCoupon'])->name('salespage.coupon');
 
+// One-tap magic login — temporary signed link (no password). Only a valid signature (HMAC of APP_KEY) works.
+Route::get('/masuk/{user}', function (\App\Models\User $user) {
+    \Illuminate\Support\Facades\Auth::login($user, remember: true);
+
+    return redirect()->route('dashboard');
+})->middleware('signed')->name('auto.login');
+
 // BayarCash payment callbacks
 Route::match(['get', 'post'], '/payment/return', [\App\Http\Controllers\PaymentController::class, 'return'])->name('payment.return');
 Route::post('/payment/callback', [\App\Http\Controllers\PaymentController::class, 'callback'])->name('payment.callback');

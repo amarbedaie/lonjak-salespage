@@ -167,7 +167,8 @@ TXT;
             . 'Contoh: {"type":"hero","label":"Hero","headline":"Tajuk utama","body":"Ayat sokongan","bullets":["poin 1","poin 2"]}. '
             . 'TAMBAHAN GAYA (penting untuk convert): '
             . 'hero MESTI ada "badge" = hook provokatif SANGAT pendek untuk pill merah atas (cth soalan menusuk "Masih bertangguh?", "Penat tapi tak menjadi?"). '
-            . 'Untuk blok problem & agitate, dalam setiap bullet, BALUT 2-3 perkataan/frasa emosi PALING penting dalam **bold** (guna tanda bintang dua, cth: "rasa **sangat bersalah** setiap kali"). Ini buat ayat hidup.';
+            . 'Untuk blok problem & agitate, dalam setiap bullet, BALUT 2-3 perkataan/frasa emosi PALING penting dalam **bold** (guna tanda bintang dua, cth: "rasa **sangat bersalah** setiap kali"). Ini buat ayat hidup. '
+            . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Simpan butiran/penerangan panjang dalam body, BUKAN dalam headline. Headline = pukulan, body = cerita.';
     }
 
     /** Generate N salespage variants in parallel, each led by a different angle. */

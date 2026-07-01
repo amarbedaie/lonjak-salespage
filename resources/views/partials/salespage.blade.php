@@ -52,7 +52,7 @@
             @case('hero')
                 <section class="{{ $T['heroBg'] }} px-6 pb-2 pt-8 text-center">
                     <span class="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-[0.7rem] font-extrabold uppercase tracking-wide {{ $T['badge'] }}">{{ $b['badge'] ?? 'Jangan tangguh lagi' }}</span>
-                    <h1 class="font-display mx-auto mt-5 max-w-[16ch] text-[2.2rem] font-black leading-[1.04] tracking-tight text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
+                    <h1 class="font-display mx-auto mt-5 max-w-[17ch] text-[1.95rem] font-black leading-[1.12] text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
                     <p class="mx-auto mt-4 max-w-[34ch] text-[0.95rem] leading-relaxed {{ $T['heroSub'] }}">{!! $hl($b['body'] ?? '') !!}</p>
                     @if (! empty($b['image']))
                         <div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="mx-auto w-full max-w-md bg-muted-surface object-cover"></div>

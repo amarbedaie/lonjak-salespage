@@ -160,3 +160,13 @@
     transition-duration: 0.01ms !important; scroll-behavior: auto !important;
   }
 }
+
+/* Display headlines — balanced line-wrapping, no hyphenation, tuned spacing */
+.font-display {
+  text-wrap: balance;
+  hyphens: none;
+  -webkit-hyphens: none;
+  letter-spacing: -0.02em;
+  word-break: normal;
+  overflow-wrap: break-word;
+}

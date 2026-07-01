@@ -130,6 +130,48 @@
                 </section>
                 @break
 
+            @case('stats')
+                <section class="border-y border-border bg-surface px-6 py-7">
+                    <div class="mx-auto flex max-w-md items-stretch justify-around gap-2 text-center">
+                        @foreach (array_slice($b['items'] ?? [], 0, 4) as $it)
+                            <div class="flex-1 px-1">
+                                <p class="font-display text-[1.75rem] font-black leading-none {{ $T['price'] }} tnum">{{ $it['q'] ?? '' }}</p>
+                                <p class="mt-1.5 text-[0.7rem] leading-tight text-muted">{{ $it['a'] ?? '' }}</p>
+                            </div>
+                        @endforeach
+                    </div>
+                </section>
+                @break
+
+            @case('compare')
+                <section class="px-6 py-11">
+                    <h2 class="font-display mx-auto max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? 'Kenapa ini berbeza' }}</h2>
+                    <div class="mx-auto mt-6 max-w-md overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-sm">
+                        <div class="grid grid-cols-2">
+                            <div class="bg-muted-surface px-3 py-2.5 text-center text-[0.7rem] font-bold uppercase tracking-wide text-muted">Cara biasa</div>
+                            <div class="{{ $T['offerHead'] }} px-3 py-2.5 text-center text-[0.7rem] font-bold uppercase tracking-wide {{ $T['accent'] }}">Pilihan bijak</div>
+                            @foreach ($b['items'] ?? [] as $it)
+                                <div class="flex items-start gap-2 border-t border-border px-3 py-3 text-sm text-muted"><x-lucide-x class="mt-0.5 size-4 shrink-0 text-rose-400" /><span>{{ $it['q'] ?? '' }}</span></div>
+                                <div class="flex items-start gap-2 border-l border-t border-border bg-success-soft/20 px-3 py-3 text-sm font-medium text-ink"><x-lucide-check class="mt-0.5 size-4 shrink-0 text-success" /><span>{{ $it['a'] ?? '' }}</span></div>
+                            @endforeach
+                        </div>
+                    </div>
+                </section>
+                @break
+
+            @case('author')
+                <section class="{{ $T['sectionBg'] }} px-6 py-10">
+                    <div class="mx-auto max-w-md rounded-[var(--radius-xl)] border border-border bg-bg p-6 shadow-sm">
+                        <div class="flex items-center gap-3">
+                            <span class="flex size-12 shrink-0 items-center justify-center rounded-full {{ $T['offerHead'] }}"><x-lucide-badge-check class="size-6 {{ $T['accent'] }}" /></span>
+                            <h2 class="font-display text-lg font-black leading-tight">{{ $b['headline'] ?? 'Kenapa boleh percaya' }}</h2>
+                        </div>
+                        @if (! empty($b['body']))<p class="mt-3.5 text-sm leading-relaxed text-ink-soft">{{ $b['body'] }}</p>@endif
+                        @if (! empty($b['bullets']))<ul class="mt-4 space-y-2.5">@foreach ($b['bullets'] as $bl)<li class="flex items-start gap-2.5 text-sm text-ink-soft"><x-lucide-check class="mt-0.5 size-4 shrink-0 text-success" />{{ $bl }}</li>@endforeach</ul>@endif
+                    </div>
+                </section>
+                @break
+
             @case('offer')
                 @php $price = (float) ($b['meta']['price'] ?? $heroPrice); $compare = (float) ($b['meta']['compare'] ?? $heroCompare); $save = $compare > $price ? round(($compare - $price) / $compare * 100) : 0; @endphp
                 <section class="{{ $T['sectionBg'] }} px-5 py-10">

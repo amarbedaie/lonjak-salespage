@@ -31,10 +31,13 @@ PRINSIP SOKONGAN:
 
 STRUKTUR BLOK (ikut turutan; setiap satu PANJANG, berlapis & menyentuh):
 - hero: badge = hook SANGAT pendek (soalan/angka menusuk). headline = janji + ANGKA/spesifik (5-9 patah, MAX 12). body 3-4 ayat. bullets 3-4 kemenangan. meta.customers.
+- stats: jalur 3-4 angka BESAR bina kredibiliti pantas. items[]: q = angka pendek (cth "5,000+", "28", "100%", "4.9★"), a = label pendek (cth "pembaca berpuas hati"). Angka munasabah & jujur.
 - problem: "Anda kenal situasi ni?" body 3-4 ayat sentuh hati. bullets 4-5 pain SANGAT spesifik (balut frasa emosi penting dalam **bold**).
 - agitate: kos kalau dibiar (emosi+masa+rohani+keluarga) naik beransur, TAPI akhiri dengan harapan. body 3-5 ayat + bullets (**bold**).
 - listicle: WAJIB bernombor. headline "[N] [Kesilapan/Hukum/Tanda...] ...". items[]: 5-9 point, q = tajuk point pendek menyentak, a = huraian 1-2 ayat (+ faedah rare bila sesuai). Point paling kuat di NOMBOR AKHIR.
 - solution: perkenal produk + MEKANISME UNIK kenapa ia berkesan walau cara lain gagal + JAMBATAN "kena ada guru/panduan tersusun". body 3-4 ayat. bullets 4-6.
+- compare: jadual "cara biasa vs [produk]". items[]: q = cara lama/biasa yang menyakitkan (negatif), a = penyelesaian dengan produk anda (positif). 4-5 baris. Jujur, bukan memperlekeh produk lain.
+- author: kredibiliti — kenapa boleh percaya. headline pendek. body 2-3 ayat. bullets 3-4 kelayakan/sandaran (untuk buku agama: sebut pegangan Ahli Sunnah wal Jamaah / Mazhab Syafi'i & proses semakan secara UMUM & jujur; JANGAN reka nama atau kelayakan spesifik yang tak pasti).
 - offer: offer stack SPESIFIK — bullets 5-7 (apa TEPAT dalam produk + nilai RM tersirat). body 2 ayat. meta.price + meta.compare.
 - bonus: 2-3 bonus bernilai (cth "Bonus: Audio MP3 sebutan (nilai RM47)").
 - proof: 3 testimoni jujur. items[].q = "Nama, Bandar", items[].a = hasil spesifik 2-3 ayat.
@@ -48,10 +51,10 @@ EMAS: ANGKA & spesifik MENANG. PANJANG > ringkas. Berlapis > satu nota. Jujur > 
 TXT;
 
     public const BLOCK_LABELS = [
-        'hero' => 'Hero / Headline', 'problem' => 'Masalah', 'agitate' => 'Agitate',
-        'listicle' => 'Senarai Bernombor', 'solution' => 'Solusi + Mekanisme', 'offer' => 'Tawaran',
-        'bonus' => 'Bonus', 'proof' => 'Bukti Sosial', 'guarantee' => 'Jaminan', 'urgency' => 'Urgency',
-        'faq' => 'Soalan Lazim', 'cta' => 'Call To Action', 'ps' => 'P.S.',
+        'hero' => 'Hero / Headline', 'stats' => 'Statistik', 'problem' => 'Masalah', 'agitate' => 'Agitate',
+        'listicle' => 'Senarai Bernombor', 'solution' => 'Solusi + Mekanisme', 'compare' => 'Perbandingan',
+        'author' => 'Penulis / Kredibiliti', 'offer' => 'Tawaran', 'bonus' => 'Bonus', 'proof' => 'Bukti Sosial',
+        'guarantee' => 'Jaminan', 'urgency' => 'Urgency', 'faq' => 'Soalan Lazim', 'cta' => 'Call To Action', 'ps' => 'P.S.',
     ];
 
     /** @return array{page: array, source: string} */
@@ -176,6 +179,7 @@ TXT;
             . 'Untuk blok problem & agitate, dalam setiap bullet, BALUT 2-3 perkataan/frasa emosi PALING penting dalam **bold** (guna tanda bintang dua, cth: "rasa **sangat bersalah** setiap kali"). Ini buat ayat hidup. '
             . 'WAJIB ADA satu blok "listicle" (letak selepas agitate, sebelum solution): headline bermula dengan ANGKA (cth "7 Kesilapan Tajwid Ramai Buat"), dan guna "items" = array objek {q,a} di mana q = tajuk point pendek & menyentak (renderer akan nomborkan 1,2,3…), a = huraian 1-2 ayat. Beri 5-9 point; point paling mengejut di NOMBOR AKHIR. '
             . 'WAJIB hero ada ANGKA spesifik (dalam badge atau headline). WAJIB blok solution ada jambatan "kena ada guru/panduan tersusun". WAJIB blok offer nyatakan TEPAT apa dalam produk (bab/modul/audio/bonus + nilai). '
+            . 'Blok "stats" guna "items" [{q,a}]: q = angka pendek (cth "5,000+"), a = label pendek. Blok "compare" guna "items" [{q,a}]: q = cara biasa/lama (negatif), a = dengan produk (positif). Blok "author" guna headline + body + bullets (kelayakan). Sertakan blok stats (selepas hero), compare & author (sebelum offer) bila munasabah. '
             . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Simpan butiran/penerangan panjang dalam body, BUKAN dalam headline. Headline = pukulan, body = cerita.';
     }
 
@@ -604,6 +608,11 @@ TXT;
                 'headline' => "Akhirnya — Cara {$audience} Selesaikan " . ($problem ?: 'masalah harian') . " Tanpa Buang Masa & Duit",
                 'body' => "{$name} direka khas untuk {$audience} yang dah penat cuba macam-macam tapi tak menjadi. Dalam beberapa hari, anda akan nampak bezanya.",
                 'bullets' => ['Hasil pantas', 'Senang guna', 'Diuji & dipercayai ribuan pengguna']],
+            ['type' => 'stats', 'label' => $L['stats'], 'items' => [
+                ['q' => '5,000+', 'a' => 'pelanggan berpuas hati'],
+                ['q' => '4.9★', 'a' => 'purata penilaian'],
+                ['q' => '100%', 'a' => 'jaminan wang dikembalikan'],
+            ]],
             ['type' => 'problem', 'label' => $L['problem'], 'headline' => 'Anda kenal situasi ni?',
                 'body' => $problem ? "{$problem} — dan ia makin mengganggu hari-hari anda." : 'Setiap hari masalah yang sama berulang, dan ia mula menjejaskan keyakinan anda.',
                 'bullets' => ['Dah cuba pelbagai cara tapi tak kekal', 'Buang duit pada benda yang tak menjadi', 'Rasa macam tiada jalan keluar']],
@@ -621,6 +630,16 @@ TXT;
             ['type' => 'solution', 'label' => $L['solution'], 'headline' => "Perkenalkan {$name}",
                 'body' => "{$benefits}. Mekanisme uniknya buat ia berkesan walaupun cara lain dah gagal.",
                 'bullets' => array_map('trim', explode(',', $benefits))],
+            ['type' => 'compare', 'label' => $L['compare'], 'headline' => 'Kenapa cara ini lebih baik',
+                'items' => [
+                    ['q' => 'Belajar sendiri — keliru & cepat lupa', 'a' => 'Panduan tersusun, terus faham & ingat'],
+                    ['q' => 'Kelas mahal & jadual terikat', 'a' => 'Belajar ikut masa sendiri, sekali beli'],
+                    ['q' => 'Tiada orang betulkan kesilapan', 'a' => 'Contoh jelas untuk semak sendiri'],
+                    ['q' => 'Bahan berselerak di internet', 'a' => 'Semua dalam satu, tersusun rapi'],
+                ]],
+            ['type' => 'author', 'label' => $L['author'], 'headline' => 'Disusun dengan teliti & amanah',
+                'body' => 'Setiap bahagian disemak supaya tepat, mudah difahami, dan selamat diamalkan — bukan sekadar himpunan nota.',
+                'bullets' => ['Berpegang pada sumber muktabar', 'Bahasa mudah untuk semua peringkat', 'Disusun oleh pasukan berpengalaman']],
             ['type' => 'offer', 'label' => $L['offer'], 'headline' => 'Inilah yang anda akan dapat',
                 'body' => "Pakej penuh {$name} — semua yang anda perlukan untuk mula hari ini.",
                 'bullets' => ["{$name} (nilai RM{$compare})", 'Panduan penggunaan langkah demi langkah', 'Sokongan WhatsApp keutamaan'],

@@ -433,14 +433,17 @@ TXT;
      */
     public function holdingProductImage(string $productPath): ?string
     {
-        $prompt = 'PHOTOREALISTIC photograph: a warm, friendly Malaysian Muslim person in modest, respectful attire '
-            . 'HOLDING the exact book shown in the reference image and presenting it toward the camera with both hands — '
-            . 'the book cover faces the camera, fully visible and in sharp focus. Reproduce the book cover EXACTLY as in the '
-            . 'reference image (identical title text, artwork, colours, layout); do NOT change, translate, or invent any cover text. '
-            . 'Upper-body shot, genuine smile, looking at the camera. Bright, clean, softly-lit indoor background, natural light, '
-            . 'shallow depth of field, premium yet authentic UGC style. '
+        $prompt = 'PHOTOREALISTIC photograph. A warm, friendly Malaysian Muslim person in modest, respectful attire '
+            . 'holds up THIS EXACT book (from the reference image) toward the camera with both hands at chest height — '
+            . 'the cover faces the camera FLAT, FULLY VISIBLE, large and centred in the frame, in sharp focus. '
+            . 'CRITICAL — the book cover must be REPRODUCED EXACTLY as in the reference image: identical title wording, '
+            . 'exact same fonts & letter shapes, same logo, same illustration/artwork, same layout and same colours. '
+            . 'Do NOT redraw, restyle, re-letter, translate, simplify, crop, or alter ANY element of the cover. '
+            . 'Treat the reference image as the real printed cover of the physical book placed into her hands. '
+            . 'Her face, hands and body are real and photographic; genuine smile, looking straight at the camera, upper-body shot. '
+            . 'Bright, clean, softly-lit indoor background, natural window light, shallow depth of field, authentic UGC / commercial look. '
             . 'STRICT: must look like a REAL photograph — absolutely NOT a cartoon, illustration, painting, anime, or 3D render. '
-            . 'No added text, captions, logos, or watermark anywhere in the image.';
+            . 'No added text, captions, extra logos, or watermark anywhere in the image.';
 
         return $this->imageFromPrompt($prompt, [$productPath]);
     }

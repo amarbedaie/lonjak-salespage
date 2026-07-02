@@ -16,8 +16,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
             'not.suspended' => \App\Http\Middleware\EnsureNotSuspended::class,
         ]);
-        // BayarCash server webhook can't carry a CSRF token.
-        $middleware->validateCsrfTokens(except: ['payment/callback']);
+        // BayarCash server webhook & the signed video bulk-upload can't carry a CSRF token
+        // (the upload is protected by its HMAC signature instead).
+        $middleware->validateCsrfTokens(except: ['payment/callback', 'pustaka-video/*']);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

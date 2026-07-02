@@ -23,20 +23,20 @@ Anda copywriter direct-response & da'i digital TERBAIK Malaysia (gaya BeDaie "1 
 5. OFFER SPESIFIK — nyatakan TEPAT apa DALAM produk: berapa bab/modul/muka surat, apa disertakan (audio, checklist, akses grup, sokongan), setiap satu dengan nilai jujur. BUKAN ayat kabur "kuasai semua ilmu".
 
 PRINSIP SOKONGAN:
-- PANJANG & BERLAPIS — JANGAN ringkas. Body 3-5 ayat penuh emosi & cerita, bullets 4-6. Long-form.
+- SKIMMABLE, BUKAN ESEI (PALING PENTING) — page boleh PANJANG, tapi TIADA tembok teks. "body" SETIAP blok MAKSIMUM 2 ayat pendek (≤18 patah setiap ayat). Semua isi selebihnya WAJIB ditukar bentuk visual: bullets (4-6, pendek), senarai bernombor (listicle items), jadual (compare items), atau angka (stats). Pembaca SKIM salespage — point yang menang, bukan perenggan.
 - Melayu santai Malaysia — "saya"/"kami", sapa "anda". Tic natural: "Betul tak?", "Nampak tak?", "Jujur je...", "Rugi tak kalau...".
 - PAIN + HARAPAN (khauf+raja') — sentuh sakit dalam-dalam TAPI sentiasa beri harapan & jalan keluar. HARAM putus asa / takut-takutkan untuk paksa beli.
 - OTORITI jujur — sandar sumber sahih secara UMUM ("ikut Mazhab Syafi'i", "rujukan ulama muktabar"). JANGAN reka nombor hadis, petikan, atau nama kitab yang tak pasti.
 - JUALAN JUJUR — harga benar (TIADA "harga asal" palsu), urgency/stok benar sahaja, testimoni munasabah. Tipu = rosak barakah.
 
-STRUKTUR BLOK (ikut turutan; setiap satu PANJANG, berlapis & menyentuh):
-- hero: badge = hook SANGAT pendek (soalan/angka menusuk). headline = janji + ANGKA/spesifik (5-9 patah, MAX 12). body 3-4 ayat. bullets 3-4 kemenangan. meta.customers.
-- stats: jalur 3-4 angka BESAR bina kredibiliti pantas. items[]: q = angka pendek (cth "5,000+", "28", "100%", "4.9★"), a = label pendek (cth "pembaca berpuas hati"). Angka munasabah & jujur.
-- problem: "Anda kenal situasi ni?" body 3-4 ayat sentuh hati. bullets 4-5 pain SANGAT spesifik (balut frasa emosi penting dalam **bold**).
-- agitate: kos kalau dibiar (emosi+masa+rohani+keluarga) naik beransur, TAPI akhiri dengan harapan. body 3-5 ayat + bullets (**bold**).
-- listicle: WAJIB bernombor. headline "[N] [Kesilapan/Hukum/Tanda...] ...". items[]: 5-9 point, q = tajuk point pendek menyentak, a = huraian 1-2 ayat (+ faedah rare bila sesuai). Point paling kuat di NOMBOR AKHIR.
-- solution: perkenal produk + MEKANISME UNIK kenapa ia berkesan walau cara lain gagal + JAMBATAN "kena ada guru/panduan tersusun". body 3-4 ayat. bullets 4-6.
-- compare: jadual "cara biasa vs [produk]". items[]: q = cara lama/biasa yang menyakitkan (negatif), a = penyelesaian dengan produk anda (positif). 4-5 baris. Jujur, bukan memperlekeh produk lain.
+STRUKTUR BLOK (ikut turutan; page panjang sebab BANYAK blok — bukan sebab perenggan panjang):
+- hero: badge = hook SANGAT pendek (soalan/angka menusuk). headline = janji + ANGKA/spesifik (5-9 patah, MAX 12). body MAX 2 ayat pendek. bullets 3-4 kemenangan. meta.customers.
+- stats: WAJIB. jalur 3-4 angka BESAR bina kredibiliti pantas. items[]: q = angka pendek (cth "5,000+", "28", "100%", "4.9★"), a = label pendek. Angka munasabah & jujur.
+- problem: "Anda kenal situasi ni?" body MAX 2 ayat pendek. bullets 4-5 pain SANGAT spesifik (balut frasa emosi penting dalam **bold**) — pain dalam BULLETS, bukan perenggan.
+- agitate: kos kalau dibiar. body MAX 2 ayat (akhiri dengan harapan). Senarai kos = bullets (**bold**), BUKAN perenggan.
+- listicle: WAJIB bernombor. headline "[N] [Kesilapan/Hukum/Tanda...] ...". items[]: 5-9 point, q = tajuk point pendek menyentak, a = huraian MAX 2 ayat pendek (+ faedah rare bila sesuai). Point paling kuat di NOMBOR AKHIR.
+- solution: perkenal produk + jambatan "kena ada guru/panduan tersusun". body MAX 2 ayat. MEKANISME ditulis sebagai bullets "Langkah 1/2/3: ..." (3-4 langkah pendek) — JANGAN terangkan mekanisme dalam perenggan.
+- compare: WAJIB. jadual "cara biasa vs [produk]". items[]: q = cara lama/biasa yang menyakitkan (negatif), a = penyelesaian dengan produk anda (positif). 4-5 baris, setiap sel ≤10 patah. Jujur, bukan memperlekeh produk lain.
 - author: kredibiliti — kenapa boleh percaya. headline pendek. body 2-3 ayat. bullets 3-4 kelayakan/sandaran (untuk buku agama: sebut pegangan Ahli Sunnah wal Jamaah / Mazhab Syafi'i & proses semakan secara UMUM & jujur; JANGAN reka nama atau kelayakan spesifik yang tak pasti).
 - offer: offer stack SPESIFIK — bullets 5-7 (apa TEPAT dalam produk + nilai RM tersirat). body 2 ayat. meta.price + meta.compare.
 - bonus: 2-3 bonus bernilai (cth "Bonus: Audio MP3 sebutan (nilai RM47)").
@@ -47,7 +47,7 @@ STRUKTUR BLOK (ikut turutan; setiap satu PANJANG, berlapis & menyentuh):
 - cta: tutup KUAT + ulang offer + value-stack ringkas. body 2-3 ayat. meta.price + meta.compare.
 - ps: 2-3 ayat — jaminan + urgency + harapan/doa ringkas.
 
-EMAS: ANGKA & spesifik MENANG. PANJANG > ringkas. Berlapis > satu nota. Jujur > bombastik kosong. Setiap ayat ada sebab buat pembaca terus baca ke bawah.
+EMAS: ANGKA & spesifik MENANG. Point & jadual > perenggan. Banyak blok pendek > sedikit blok panjang. Jujur > bombastik kosong. Setiap baris ada sebab buat pembaca terus skim ke bawah.
 TXT;
 
     public const BLOCK_LABELS = [
@@ -197,7 +197,8 @@ TXT;
             . 'WAJIB hero ada ANGKA spesifik (dalam badge atau headline). WAJIB blok solution ada jambatan "kena ada guru/panduan tersusun". WAJIB blok offer nyatakan TEPAT apa dalam produk (bab/modul/audio/bonus + nilai). '
             . 'Blok "stats" guna "items" [{q,a}]: q = angka pendek (cth "5,000+"), a = label pendek. Blok "compare" guna "items" [{q,a}]: q = cara biasa/lama (negatif), a = dengan produk (positif). Blok "author" guna headline + body + bullets (kelayakan). Sertakan blok stats (selepas hero), compare & author (sebelum offer) bila munasabah. '
             . 'GAYA HERO — blok hero BOLEH ada "style": "classic" | "image-first" | "bold-number". Pilih ikut sudut variasi: "bold-number" bila headline MULA dengan angka besar & kau mahu angka jadi fokus visual; "image-first" bila mahu gambar orang-pegang-produk memimpin di paling atas; "classic" = seimbang. Setiap variasi ELOK guna style berbeza supaya 3 variasi nampak berlainan. '
-            . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Simpan butiran/penerangan panjang dalam body, BUKAN dalam headline. Headline = pukulan, body = cerita.';
+            . 'TIPOGRAFI (WAJIB) — headline (hero & SETIAP seksyen) mesti PENDEK, PADAT & bertenaga: idealnya 5-9 patah perkataan, MAKSIMUM 12. JANGAN headline panjang berjela yang jadi 6-8 baris & nampak sesak. Headline = pukulan. '
+            . 'HAD KERAS BODY (WAJIB PATUH) — setiap "body" MAKSIMUM 2 ayat pendek (≤18 patah/ayat, jumlah ≤160 aksara). Kalau isi lebih dari itu, JANGAN panjangkan body — pindahkan isi ke bullets / items / jadual compare / stats. Body yang melebihi had = output GAGAL. Blok stats, compare & listicle WAJIB ada dalam setiap salespage.';
     }
 
     /** Generate N salespage variants in parallel, each led by a different angle. */

@@ -29,6 +29,33 @@
     $painEmoji = ['😔', '😰', '🤔', '😣', '💸', '😩', '😞'];
     $hl = fn ($text) => preg_replace('/\*\*(.+?)\*\*/', '<strong class="' . $T['emoHead'] . '">$1</strong>', e($text));
 
+    // Split a long body into short readable paragraphs — no walls of text, ever.
+    $paras = function ($text): array {
+        $text = trim((string) $text);
+        if ($text === '') {
+            return [];
+        }
+        if (mb_strlen($text) <= 180) {
+            return [$text];
+        }
+        $sents = preg_split('/(?<=[.!?…])\s+/u', $text) ?: [$text];
+        $out = [];
+        $cur = '';
+        foreach ($sents as $s) {
+            $try = $cur === '' ? $s : $cur . ' ' . $s;
+            if (mb_strlen($try) > 180 && $cur !== '') {
+                $out[] = $cur;
+                $cur = $s;
+            } else {
+                $cur = $try;
+            }
+        }
+        if ($cur !== '') {
+            $out[] = $cur;
+        }
+        return $out;
+    };
+
     $heroPrice = 0; $heroCompare = 0; $urgencyText = '';
     foreach ($blocks as $bb) {
         if (in_array($bb['type'] ?? '', ['offer', 'cta'], true) && ! empty($bb['meta']['price']) && ! $heroPrice) {
@@ -68,7 +95,10 @@
                     @else
                         <h1 class="font-display mx-auto mt-5 max-w-[17ch] text-[1.95rem] font-black leading-[1.12] text-balance {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h1>
                     @endif
-                    <p class="mx-auto mt-4 max-w-[34ch] text-[0.95rem] leading-relaxed {{ $T['heroSub'] }}">{!! $hl($b['body'] ?? '') !!}</p>
+                    @php $chunks = $paras($b['body'] ?? ''); @endphp
+                    <div class="mx-auto mt-4 max-w-[36ch] space-y-2.5 {{ count($chunks) > 1 ? 'text-left' : '' }}">
+                        @foreach ($chunks as $pp)<p class="text-[0.95rem] leading-relaxed {{ $T['heroSub'] }}">{!! $hl($pp) !!}</p>@endforeach
+                    </div>
                     @if ($hs !== 'image-first' && ! empty($b['image']))
                         <div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="mx-auto w-full max-w-md bg-muted-surface object-cover"></div>
                     @endif
@@ -87,7 +117,8 @@
                 <section class="{{ $T['sectionBg'] }} px-6 pb-10 pt-6 text-center">
                     <span class="text-4xl">{{ $painEmoji[0] }}</span>
                     <h2 class="font-display mx-auto mt-3 max-w-[18ch] text-[1.7rem] font-black leading-tight tracking-tight {{ $T['emoHead'] }}">{{ $b['headline'] ?? '' }}</h2>
-                    @if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{!! $hl($b['body']) !!}</p>@endif
+                    @php $chunks = $paras($b['body'] ?? ''); @endphp
+                    @if ($chunks)<div class="mx-auto mt-3 max-w-[42ch] space-y-2.5 text-left {{ count($chunks) === 1 ? 'sm:text-center' : '' }}">@foreach ($chunks as $pp)<p class="text-[0.95rem] leading-relaxed text-ink-soft">{!! $hl($pp) !!}</p>@endforeach</div>@endif
                     @if (! empty($b['image']))<div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3 text-left">
@@ -103,7 +134,8 @@
                 <section class="{{ $T['sectionBg'] }} px-6 pb-10 pt-2 text-center">
                     <span class="text-4xl">⚠️</span>
                     <h2 class="font-display mx-auto mt-3 max-w-[22ch] text-[1.6rem] font-black leading-tight tracking-tight {{ $T['emoHead'] }}">{{ $b['headline'] ?? '' }}</h2>
-                    <p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{!! $hl($b['body'] ?? '') !!}</p>
+                    @php $chunks = $paras($b['body'] ?? ''); @endphp
+                    <div class="mx-auto mt-3 max-w-[42ch] space-y-2.5 text-left {{ count($chunks) === 1 ? 'sm:text-center' : '' }}">@foreach ($chunks as $pp)<p class="text-[0.95rem] leading-relaxed text-ink-soft">{!! $hl($pp) !!}</p>@endforeach</div>
                     @if (! empty($b['image']))<div class="-mx-6 mt-6 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <div class="mx-auto mt-6 grid max-w-md gap-3 text-left">
@@ -136,7 +168,8 @@
                 <section class="px-6 py-10">
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Penyelesaiannya</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.7rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? '' }}</h2>
-                    <p class="mx-auto mt-3 max-w-[42ch] text-left text-[0.95rem] leading-relaxed text-ink-soft sm:text-center">{{ $b['body'] ?? '' }}</p>
+                    @php $chunks = $paras($b['body'] ?? ''); @endphp
+                    <div class="mx-auto mt-3 max-w-[42ch] space-y-2.5 text-left {{ count($chunks) === 1 ? 'sm:text-center' : '' }}">@foreach ($chunks as $pp)<p class="text-[0.95rem] leading-relaxed text-ink-soft">{{ $pp }}</p>@endforeach</div>
                     @if (! empty($b['image']))<div class="mx-auto mt-6 max-w-sm overflow-hidden rounded-[var(--radius-xl)] border border-border shadow-lg"><img src="{{ $b['image'] }}" alt="" class="w-full object-cover"></div>@endif
                     @if (! empty($b['bullets']))
                         <ul class="mx-auto mt-6 grid max-w-md gap-2.5">@foreach ($b['bullets'] as $bl)<li class="flex items-start gap-3 text-sm"><span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-success/15 text-success"><x-lucide-check class="size-3" /></span><span class="text-ink-soft">{{ $bl }}</span></li>@endforeach</ul>

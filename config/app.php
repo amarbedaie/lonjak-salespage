@@ -15,6 +15,9 @@ return [
 
     'name' => env('APP_NAME', 'Laravel'),
 
+    // Secret slug for the owner quick-door login route (/go/{key}). Empty = disabled.
+    'owner_key' => env('MENDAP_OWNER_KEY'),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -44,6 +44,18 @@ Route::post('/pustaka-video/{user}', function (\App\Models\User $user, \Illumina
     return response()->json(['ok' => true, 'path' => $path, 'url' => asset('storage/'.$path)]);
 })->middleware('signed')->name('video.upload');
 
+// Owner quick-door: short stable login URL guarded by a secret key in .env (MENDAP_OWNER_KEY).
+// Easy to type/bookmark, never expires; rotate or remove the env key to revoke.
+Route::get('/go/{key}', function (string $key) {
+    $expect = (string) config('app.owner_key', '');
+    abort_unless($expect !== '' && hash_equals($expect, $key), 404);
+    $u = \App\Models\User::where('email', 'amarmirza94@gmail.com')->first();
+    abort_unless((bool) $u, 404);
+    \Illuminate\Support\Facades\Auth::login($u, remember: true);
+
+    return redirect()->route('dashboard');
+})->name('owner.door');
+
 // One-tap magic login — temporary signed link (no password). Only a valid signature (HMAC of APP_KEY) works.
 Route::get('/masuk/{user}', function (\App\Models\User $user) {
     \Illuminate\Support\Facades\Auth::login($user, remember: true);

@@ -128,6 +128,11 @@ class Builder extends Component
             $this->images = \App\Services\MockupLibrary::attachFor($this->name, auth()->id());
         }
 
+        // No video given? Auto-detect one from the merchant's video library (local clip or YouTube map).
+        if (trim($this->videoUrl) === '') {
+            $this->videoUrl = \App\Services\VideoLibrary::match($this->name, auth()->id()) ?: '';
+        }
+
         // 3 variants (different angles), in parallel.
         $this->variants = $gen->generateVariants($brief, 3);
         $this->selectedVariant = 0;

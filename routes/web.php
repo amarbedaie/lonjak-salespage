@@ -30,6 +30,20 @@ Route::get('/s/{slug}', [PublicController::class, 'show'])->name('salespage.publ
 Route::post('/s/{slug}/order', [PublicController::class, 'order'])->name('salespage.order');
 Route::post('/s/{slug}/coupon', [PublicController::class, 'validateCoupon'])->name('salespage.coupon');
 
+// Signed bulk-upload for the video library (Pustaka Video) — used with a temporary signed URL.
+Route::post('/pustaka-video/{user}', function (\App\Models\User $user, \Illuminate\Http\Request $request) {
+    $request->validate([
+        'video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/webm,video/x-m4v|max:153600', // 150MB
+        'name' => 'nullable|string|max:150',
+    ]);
+    $original = $request->input('name') ?: $request->file('video')->getClientOriginalName();
+    $slug = \Illuminate\Support\Str::slug(pathinfo($original, PATHINFO_FILENAME)) ?: 'video-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(6));
+    $ext = strtolower($request->file('video')->getClientOriginalExtension() ?: 'mp4');
+    $path = $request->file('video')->storeAs('videos/'.$user->id, $slug.'.'.$ext, 'public');
+
+    return response()->json(['ok' => true, 'path' => $path, 'url' => asset('storage/'.$path)]);
+})->middleware('signed')->name('video.upload');
+
 // One-tap magic login — temporary signed link (no password). Only a valid signature (HMAC of APP_KEY) works.
 Route::get('/masuk/{user}', function (\App\Models\User $user) {
     \Illuminate\Support\Facades\Auth::login($user, remember: true);

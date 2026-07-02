@@ -74,6 +74,8 @@ Route::middleware(['auth', 'not.suspended'])->prefix('dashboard')->group(functio
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::post('/orders/{order}/status', [OrderController::class, 'setStatus'])->name('orders.status');
 
+    Route::get('/media', \App\Livewire\MediaLibrary::class)->name('media.index');
+
     Route::get('/products', [ProductController::class, 'index'])->name('products.index');
     Route::get('/products/new', [ProductController::class, 'create'])->name('products.create');
     Route::post('/products', [ProductController::class, 'store'])->name('products.store');

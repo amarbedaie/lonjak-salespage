@@ -327,7 +327,8 @@ TXT;
                     }
                 }
                 if ($slot !== null) {
-                    if ($img = $this->readingProductImage($imagePaths[0])) {
+                    $img = $this->readingProductImage($imagePaths[0]) ?? $this->readingProductImage($imagePaths[0]);
+                    if ($img) {
                         $blocks[$slot]['image'] = asset('storage/' . $img);
                     }
                     break;
@@ -336,8 +337,11 @@ TXT;
         }
 
         // A real person holding the ACTUAL product, presented to the camera — hero trust shot.
+        // Image generation can transiently fail — retry once so the mandate (every salespage
+        // carries a person holding the real product) actually holds.
         if (! empty($imagePaths[0]) && config('services.openrouter.key')) {
-            if ($held = $this->holdingProductImage($imagePaths[0])) {
+            $held = $this->holdingProductImage($imagePaths[0]) ?? $this->holdingProductImage($imagePaths[0]);
+            if ($held) {
                 $heldUrl = asset('storage/' . $held);
                 foreach ($blocks as $i => $b) {
                     if (($b['type'] ?? '') === 'hero') {

@@ -122,6 +122,12 @@ class Builder extends Component
             'problem' => $this->problem, 'benefits' => $this->benefits, 'tone' => $this->tone,
         ];
 
+        // No images uploaded? Auto-detect the product in the mockup library (BeDaie covers)
+        // so every salespage ships with the real book mockups without any upload.
+        if (empty($this->images)) {
+            $this->images = \App\Services\MockupLibrary::attachFor($this->name, auth()->id());
+        }
+
         // 3 variants (different angles), in parallel.
         $this->variants = $gen->generateVariants($brief, 3);
         $this->selectedVariant = 0;

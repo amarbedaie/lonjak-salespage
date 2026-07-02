@@ -315,6 +315,25 @@ TXT;
             }
         }
 
+        // A real person READING/USING the actual product — lifestyle proof shot (fills proof/solution gap).
+        if (! empty($imagePaths[0]) && config('services.openrouter.key')) {
+            foreach (['proof', 'solution', 'guarantee'] as $target) {
+                $slot = null;
+                foreach ($blocks as $i => $b) {
+                    if (($b['type'] ?? '') === $target && empty($blocks[$i]['image'])) {
+                        $slot = $i;
+                        break;
+                    }
+                }
+                if ($slot !== null) {
+                    if ($img = $this->readingProductImage($imagePaths[0])) {
+                        $blocks[$slot]['image'] = asset('storage/' . $img);
+                    }
+                    break;
+                }
+            }
+        }
+
         // A real person holding the ACTUAL product, presented to the camera — hero trust shot.
         if (! empty($imagePaths[0]) && config('services.openrouter.key')) {
             if ($held = $this->holdingProductImage($imagePaths[0])) {
@@ -359,14 +378,14 @@ TXT;
             $instruction = "Anda pengarah kreatif & marketer direct-response SENIOR (fikir macam Alex Hormozi — apa yang CONVERT). "
                 . "Salespage ini ada blok berikut (ikut urutan):\n{$summary}\n\n"
                 . 'Di bawah ada ' . count($imagePaths) . ' gambar (Gambar #0, #1, ...)' . ($video ? ' dan ada 1 video' : '') . ". "
-                . 'Tengok SETIAP gambar, faham apa ia, dan tugaskan ke blok PALING SESUAI untuk menjual: '
-                . 'gambar produk/mockup → hero atau offer; gambar emosi/lifestyle/orang → problem atau agitate; '
-                . 'gambar produk digunakan/demo → solution; screenshot bukti/testimoni → proof. '
-                . 'Satu gambar satu blok. Kalau gambar tak sesuai untuk hero & tiada mockup produk, set need_poster=true. '
-                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"problem"}, "video_block": "hero|solution|null", "need_poster": false, "scenes": {"problem":"...","agitate":"..."}, "theme": "hijau"}. '
+                . 'Tengok SETIAP gambar, faham apa ia, dan tugaskan ke blok PALING SESUAI untuk menjual. '
+                . 'PENTING — salespage yang convert di Malaysia penuh dengan gambar (20+): AGIHKAN SEMUA gambar yang ada, JANGAN tinggalkan mana-mana tanpa blok. '
+                . 'Panduan: mockup produk terbaik → hero; mockup lain → solution, offer, bonus, cta (satu setiap blok); gambar emosi/orang → problem/agitate; screenshot bukti → proof. '
+                . 'Satu gambar satu blok, ikut keutamaan menjual. Kalau gambar tak sesuai untuk hero & tiada mockup produk, set need_poster=true. '
+                . 'PULANGKAN HANYA JSON sah: {"assign": {"0":"hero","1":"solution","2":"offer"}, "video_block": "hero|solution|null", "need_poster": false, "scenes": {"problem":"...","agitate":"...","cta":"..."}, "theme": "hijau"}. '
                 . 'TAMBAHAN "theme" (PENTING) — pilih SATU tema warna yang paling MATCH warna dominan gambar produk & vibe niche, dari: default (pink), hijau (hijau+emas, Islamik/rohani), biru (teal), oren (hangat), ungu (purple), gelap. Cth: cover buku ungu/teal → "ungu"; produk Islamik hijau → "hijau"; skincare pink → "default". JANGAN pilih warna yang MELAWAN warna gambar produk. '
                 . 'Jenis blok sah: hero, problem, agitate, solution, offer, bonus, proof, guarantee, urgency, faq, cta, ps. '
-                . 'TAMBAHAN PENTING — "scenes": untuk seksyen EMOSI (hero jika tiada gambar produk, problem, agitate) yang TIADA gambar ditugaskan, tulis satu ayat English ringkas untuk FOTO EMOSI photorealistic (ORANG sebenar dalam situasi emosi cerita — bukan produk, bukan teks). '
+                . 'TAMBAHAN PENTING — "scenes": untuk blok problem & agitate (emosi gelap→cerah) DAN blok cta (emosi harapan/lega/berjaya selepas guna produk), tulis satu ayat English ringkas setiap satu untuk FOTO EMOSI photorealistic (ORANG sebenar Malaysia dalam situasi cerita — bukan produk, bukan teks). Sentiasa beri KETIGA-TIGA scene ini walaupun blok itu sudah ada gambar lain. '
                 . 'Contoh scene tajwid: "a worried Malaysian Muslim man in his 30s holding an open Quran at home, uncertain expression, soft natural window light, candid documentary photo, photorealistic". Buat scene yang MATCH emosi & audiens salespage.';
 
             $parts = [['type' => 'text', 'text' => $instruction]];
@@ -395,10 +414,10 @@ TXT;
         }
     }
 
-    /** Fallback placement when AI is unavailable: hero, problem, solution, then gallery. */
+    /** Fallback placement when AI is unavailable: spread across the page, then gallery. */
     private function basicMediaPlacement(array $page, array $urls, ?string $video): array
     {
-        $order = ['hero', 'problem', 'solution'];
+        $order = ['hero', 'solution', 'offer', 'problem', 'bonus', 'cta', 'proof', 'agitate'];
         $blocks = $page['blocks'] ?? [];
         $u = 0;
         foreach ($order as $type) {
@@ -461,6 +480,22 @@ TXT;
             . 'Bright, clean, softly-lit indoor background, natural window light, shallow depth of field, authentic UGC / commercial look. '
             . 'STRICT: must look like a REAL photograph — absolutely NOT a cartoon, illustration, painting, anime, or 3D render. '
             . 'No added text, captions, extra logos, or watermark anywhere in the image.';
+
+        return $this->imageFromPrompt($prompt, [$productPath]);
+    }
+
+    /**
+     * Photorealistic candid shot of a person actually READING/USING the exact product at home —
+     * the lifestyle proof shot every high-converting Malaysian salespage carries.
+     */
+    public function readingProductImage(string $productPath): ?string
+    {
+        $prompt = 'PHOTOREALISTIC candid lifestyle photograph. A Malaysian Muslim person in modest attire sits comfortably '
+            . 'at home (sofa or prayer mat area) reading THIS EXACT book from the reference image — the book is open or held '
+            . 'naturally, its front cover clearly visible and angled toward the camera. Reproduce the cover EXACTLY as in the '
+            . 'reference (same title text, artwork, colours); do NOT redraw or alter it. Warm serene expression, absorbed in '
+            . 'reading. Soft natural window light, cosy authentic Malaysian home interior, shallow depth of field, candid '
+            . 'documentary style. STRICT: real photograph look — NOT cartoon/illustration/3D. No added text or watermark.';
 
         return $this->imageFromPrompt($prompt, [$productPath]);
     }

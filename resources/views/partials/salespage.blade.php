@@ -192,6 +192,7 @@
                     <div class="mx-auto max-w-md overflow-hidden rounded-[var(--radius-xl)] border-2 bg-bg shadow-xl {{ $T['offerBorder'] }}">
                         <div class="{{ $T['offerHead'] }} px-6 py-4 text-center"><h2 class="font-display text-xl font-black">{{ $b['headline'] ?? 'Apa anda akan dapat' }}</h2></div>
                         <div class="px-6 py-6">
+                            @if (! empty($b['image']))<div class="mb-5 overflow-hidden rounded-[var(--radius-lg)]"><img src="{{ $b['image'] }}" alt="" class="w-full bg-muted-surface object-cover"></div>@endif
                             @if (! empty($b['body']))<p class="mb-4 text-center text-sm text-ink-soft">{{ $b['body'] }}</p>@endif
                             @if (! empty($b['bullets']))<ul class="space-y-3">@foreach ($b['bullets'] as $bl)<li class="flex items-start gap-3 text-sm"><span class="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-success text-white"><x-lucide-check class="size-3" /></span><span class="font-medium">{{ $bl }}</span></li>@endforeach</ul>@endif
                             @if ($price > 0)<div class="mt-6 rounded-[var(--radius-lg)] bg-muted-surface/60 p-5 text-center">@if ($compare > 0)<p class="text-sm text-muted">Harga biasa <span class="line-through tnum">{{ $rm($compare) }}</span></p>@endif<div class="mt-1 flex items-baseline justify-center gap-2"><span class="font-display text-[2.6rem] font-black leading-none {{ $T['price'] }} tnum">{{ $rm($price) }}</span>@if ($save > 0)<span class="rounded-full bg-success/15 px-2 py-0.5 text-xs font-bold text-success">Jimat {{ $save }}%</span>@endif</div></div>@endif
@@ -210,6 +211,7 @@
                 <section class="px-6 py-10">
                     <p class="text-center text-xs font-bold uppercase tracking-widest {{ $T['accent'] }}">Bukti sebenar</p>
                     <h2 class="font-display mx-auto mt-2 max-w-[18ch] text-center text-[1.6rem] font-black leading-tight tracking-tight">{{ $b['headline'] ?? 'Apa kata pelanggan' }}</h2>
+                    @if (! empty($b['image']))<div class="mx-auto mt-5 max-w-md overflow-hidden rounded-[var(--radius-xl)] shadow-md"><img src="{{ $b['image'] }}" alt="" class="w-full bg-muted-surface object-cover"></div>@endif
                     <div class="mx-auto mt-6 grid max-w-md gap-3">
                         @foreach ($b['items'] ?? [] as $it)
                             @php $name = $it['q'] ?? 'Pelanggan'; @endphp
@@ -233,7 +235,7 @@
 
             @case('cta')
                 @php $price = (float) ($b['meta']['price'] ?? $heroPrice); $compare = (float) ($b['meta']['compare'] ?? $heroCompare); @endphp
-                <section class="{{ $T['heroBg'] }} px-6 py-11 text-center"><h2 class="font-display mx-auto max-w-[18ch] text-[1.9rem] font-black leading-tight tracking-tight {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h2>@if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[34ch] text-sm {{ $T['heroSub'] }}">{{ $b['body'] }}</p>@endif @if ($price > 0)<div class="mt-5 flex items-baseline justify-center gap-2">@if ($compare > 0)<span class="text-base line-through {{ $T['heroSub'] }} tnum">{{ $rm($compare) }}</span>@endif<span class="font-display text-[2.2rem] font-black {{ $T['heroText'] }} tnum">{{ $rm($price) }}</span></div>@endif<a href="#checkout" class="mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-extrabold shadow-lg active:scale-[0.98] {{ $T['cta'] }}">{{ $b['cta_text'] ?? 'Saya Nak Sekarang' }} <x-lucide-arrow-right class="size-5" /></a><p class="mt-3 text-xs {{ $T['heroSub'] }}">🔒 Bayaran selamat · COD tersedia · Jaminan 30 hari</p></section>
+                <section class="{{ $T['heroBg'] }} px-6 py-11 text-center">@if (! empty($b['image']))<div class="-mx-6 -mt-11 mb-8 overflow-hidden"><img src="{{ $b['image'] }}" alt="" class="aspect-[4/3] w-full bg-muted-surface object-cover"></div>@endif<h2 class="font-display mx-auto max-w-[18ch] text-[1.9rem] font-black leading-tight tracking-tight {{ $T['heroText'] }}">{{ $b['headline'] ?? '' }}</h2>@if (! empty($b['body']))<p class="mx-auto mt-3 max-w-[34ch] text-sm {{ $T['heroSub'] }}">{{ $b['body'] }}</p>@endif @if ($price > 0)<div class="mt-5 flex items-baseline justify-center gap-2">@if ($compare > 0)<span class="text-base line-through {{ $T['heroSub'] }} tnum">{{ $rm($compare) }}</span>@endif<span class="font-display text-[2.2rem] font-black {{ $T['heroText'] }} tnum">{{ $rm($price) }}</span></div>@endif<a href="#checkout" class="mt-5 flex w-full items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-extrabold shadow-lg active:scale-[0.98] {{ $T['cta'] }}">{{ $b['cta_text'] ?? 'Saya Nak Sekarang' }} <x-lucide-arrow-right class="size-5" /></a><p class="mt-3 text-xs {{ $T['heroSub'] }}">🔒 Bayaran selamat · COD tersedia · Jaminan 30 hari</p></section>
                 @break
 
             @case('ps')

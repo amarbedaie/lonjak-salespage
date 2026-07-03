@@ -70,4 +70,24 @@ class OrderPaidWhatsAppTest extends TestCase
 
         Http::assertNothingSent();
     }
+
+    public function test_customer_send_failure_does_not_block_merchant(): void
+    {
+        Http::fakeSequence()
+            ->push('waha error', 500)          // customer send fails
+            ->push(['id' => 'wamid.M'], 201);  // merchant send succeeds
+
+        $order = Order::factory()->create(['phone' => '0123456789']);
+
+        try {
+            event(new OrderPaid($order));
+            $this->fail('Expected WahaException to trigger a queue retry.');
+        } catch (\Waha\WahaException $e) {
+            // expected — handle() attempts both recipients, then rethrows for retry
+        }
+
+        Http::assertSentCount(2); // both recipients attempted despite the customer failure
+        $this->assertDatabaseHas('whatsapp_logs', ['order_id' => $order->id, 'type' => 'paid_customer', 'status' => 'failed']);
+        $this->assertDatabaseHas('whatsapp_logs', ['order_id' => $order->id, 'type' => 'paid_merchant', 'status' => 'sent']);
+    }
 }

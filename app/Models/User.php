@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'business_name', 'phone', 'email', 'password', 'role', 'plan', 'ai_credits', 'status', 'bayarcash_pat', 'bayarcash_portal_key', 'bayarcash_api_secret', 'bayarcash_sandbox', 'bayarcash_active', 'easyparcel_api_key', 'easyparcel_sandbox', 'ship_name', 'ship_phone', 'ship_addr1', 'ship_addr2', 'ship_city', 'ship_state', 'ship_postcode'])]
+#[Fillable(['name', 'business_name', 'phone', 'email', 'password', 'role', 'plan', 'ai_credits', 'status', 'bayarcash_pat', 'bayarcash_portal_key', 'bayarcash_api_secret', 'bayarcash_sandbox', 'bayarcash_active', 'easyparcel_api_key', 'easyparcel_sandbox', 'ship_name', 'ship_phone', 'ship_addr1', 'ship_addr2', 'ship_city', 'ship_state', 'ship_postcode', 'notify_whatsapp'])]
 #[Hidden(['password', 'remember_token', 'bayarcash_pat', 'bayarcash_api_secret', 'easyparcel_api_key'])]
 class User extends Authenticatable
 {

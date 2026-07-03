@@ -8,8 +8,12 @@
         "framework"
     ],
     "license": "MIT",
+    "repositories": [
+        { "type": "path", "url": "packages/waha", "options": { "symlink": true } }
+    ],
     "require": {
         "php": "^8.3",
+        "amarbedaie/waha": "*",
         "laravel/framework": "^13.8",
         "laravel/tinker": "^3.0",
         "livewire/livewire": "^4.3",

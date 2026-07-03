@@ -4,8 +4,43 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "54ce77c457cd99fa4f97d0a8a4cd108d",
+    "content-hash": "adb85303b60f757414fc07bfc6a9d509",
     "packages": [
+        {
+            "name": "amarbedaie/waha",
+            "version": "1.0.0",
+            "dist": {
+                "type": "path",
+                "url": "packages/waha",
+                "reference": "6f7fe95ec2210fc28762b74be507d96d46728b48"
+            },
+            "require": {
+                "illuminate/http": "^13.0",
+                "illuminate/support": "^13.0",
+                "php": "^8.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Waha\\WahaServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Waha\\": "src/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "Minimal WAHA (WhatsApp HTTP API) client for Laravel apps.",
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
+        },
         {
             "name": "blade-ui-kit/blade-icons",
             "version": "1.10.0",

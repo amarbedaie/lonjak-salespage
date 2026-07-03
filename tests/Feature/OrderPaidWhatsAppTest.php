@@ -90,4 +90,15 @@ class OrderPaidWhatsAppTest extends TestCase
         $this->assertDatabaseHas('whatsapp_logs', ['order_id' => $order->id, 'type' => 'paid_customer', 'status' => 'failed']);
         $this->assertDatabaseHas('whatsapp_logs', ['order_id' => $order->id, 'type' => 'paid_merchant', 'status' => 'sent']);
     }
+
+    public function test_flag_off_does_not_queue_the_listener(): void
+    {
+        config()->set('whatsapp.enabled', false);
+        \Illuminate\Support\Facades\Queue::fake();
+
+        $order = Order::factory()->create(['phone' => '0123456789']);
+        event(new OrderPaid($order));
+
+        \Illuminate\Support\Facades\Queue::assertNothingPushed();
+    }
 }

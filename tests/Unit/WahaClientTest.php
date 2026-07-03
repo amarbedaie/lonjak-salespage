@@ -40,4 +40,14 @@ class WahaClientTest extends TestCase
         $this->expectException(WahaException::class);
         (new WahaClient('https://waha.test', 'bad', 'amarbedaie'))->sendText('60123456789@c.us', 'Hai');
     }
+
+    public function test_send_text_wraps_connection_exception(): void
+    {
+        Http::fake(function () {
+            throw new \Illuminate\Http\Client\ConnectionException('Connection timed out');
+        });
+
+        $this->expectException(WahaException::class);
+        (new WahaClient('https://waha.test', 'k', 'amarbedaie'))->sendText('60123456789@c.us', 'Hai');
+    }
 }

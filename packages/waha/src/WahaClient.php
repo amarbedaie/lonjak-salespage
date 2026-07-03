@@ -2,6 +2,7 @@
 
 namespace Waha;
 
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Facades\Http;
 
 class WahaClient
@@ -33,14 +34,18 @@ class WahaClient
     /** Send a text message. Throws WahaException on a non-2xx response. */
     public function sendText(string $chatId, string $text, ?string $session = null): array
     {
-        $response = Http::withHeaders(['X-Api-Key' => $this->apiKey])
-            ->timeout($this->timeout)
-            ->acceptJson()
-            ->post(rtrim($this->baseUrl, '/').'/api/sendText', [
-                'session' => $session ?? $this->defaultSession,
-                'chatId' => $chatId,
-                'text' => $text,
-            ]);
+        try {
+            $response = Http::withHeaders(['X-Api-Key' => $this->apiKey])
+                ->timeout($this->timeout)
+                ->acceptJson()
+                ->post(rtrim($this->baseUrl, '/').'/api/sendText', [
+                    'session' => $session ?? $this->defaultSession,
+                    'chatId' => $chatId,
+                    'text' => $text,
+                ]);
+        } catch (ConnectionException $e) {
+            throw new WahaException('WAHA sendText connection failed: '.$e->getMessage(), previous: $e);
+        }
 
         if ($response->failed()) {
             throw new WahaException("WAHA sendText failed ({$response->status()}): ".$response->body());

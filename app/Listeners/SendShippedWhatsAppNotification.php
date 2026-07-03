@@ -16,6 +16,11 @@ class SendShippedWhatsAppNotification implements ShouldQueue
 
     public function __construct(private WahaClient $waha) {}
 
+    public function shouldQueue(OrderShipped $event): bool
+    {
+        return (bool) config('whatsapp.enabled');
+    }
+
     public function handle(OrderShipped $event): void
     {
         if (! config('whatsapp.enabled')) {

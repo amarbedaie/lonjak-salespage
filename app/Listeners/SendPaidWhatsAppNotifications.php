@@ -17,6 +17,11 @@ class SendPaidWhatsAppNotifications implements ShouldQueue
 
     public function __construct(private WahaClient $waha) {}
 
+    public function shouldQueue(OrderPaid $event): bool
+    {
+        return (bool) config('whatsapp.enabled');
+    }
+
     public function handle(OrderPaid $event): void
     {
         if (! config('whatsapp.enabled')) {

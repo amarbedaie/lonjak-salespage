@@ -27,6 +27,7 @@ class PaymentController extends Controller
 
         if ($order) {
             Mailer::orderPaid($order);
+            event(new \App\Events\OrderPaid($order));
         }
 
         return response('OK', 200);

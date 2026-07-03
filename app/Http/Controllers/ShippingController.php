@@ -108,6 +108,8 @@ class ShippingController extends Controller
             'status' => 'diproses',
         ]);
 
+        event(new \App\Events\OrderShipped($order));
+
         return back()->with('ok', 'Penghantaran ditempah! AWB '.($res['awb'] ?? '').' dijana.');
     }
 }

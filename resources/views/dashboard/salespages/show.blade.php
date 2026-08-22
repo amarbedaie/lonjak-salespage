@@ -111,6 +111,28 @@
                     <p class="text-xs text-muted">Checkout awam di <a href="{{ url('/s/'.$salespage->slug) }}" class="text-primary hover:underline">/s/{{ $salespage->slug }}</a>.</p>
                 </x-ui.card-body>
             </x-ui.card>
+            <x-ui.card class="mt-6">
+                <x-ui.card-header title="Akses automatik (provisioning)" subtitle="Lepas pelanggan bayar, akaun premium dibuka sendiri di system pilihan & magic link dihantar via WhatsApp" />
+                <x-ui.card-body class="max-w-md space-y-4">
+                    <form method="POST" action="{{ route('salespages.update', $salespage) }}" class="space-y-4">@csrf @method('PUT')
+                        <input type="hidden" name="title" value="{{ $salespage->title }}">
+                        <input type="hidden" name="price" value="{{ $salespage->price }}">
+                        <input type="hidden" name="gateway" value="{{ $salespage->gateway }}">
+                        <x-ui.field label="System yang dibuka" hint="pilih 'Tiada' untuk produk fizikal / tanpa akses">
+                            <x-ui.select name="provision_system">
+                                <option value="">Tiada — produk fizikal</option>
+                                @foreach (config('provisioning.systems') as $slug => $sys)
+                                    <option value="{{ $slug }}" @selected($salespage->provision_system === $slug)>{{ $sys['name'] }}</option>
+                                @endforeach
+                            </x-ui.select>
+                        </x-ui.field>
+                        <x-ui.button type="submit" size="sm">Simpan</x-ui.button>
+                    </form>
+                    @unless (config('provisioning.enabled'))
+                        <p class="text-xs text-amber-600">Provisioning masih OFF — set <code>PROVISIONING_ENABLED=true</code> dalam .env untuk aktifkan.</p>
+                    @endunless
+                </x-ui.card-body>
+            </x-ui.card>
         </div>
 
         {{-- Settings --}}

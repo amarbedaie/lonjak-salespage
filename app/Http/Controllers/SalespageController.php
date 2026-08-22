@@ -6,6 +6,7 @@ use App\Models\Salespage;
 use App\Services\SalespageGenerator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class SalespageController extends Controller
 {
@@ -52,6 +53,7 @@ class SalespageController extends Controller
             'price' => 'required|numeric|min:0',
             'compare_price' => 'nullable|numeric|min:0',
             'gateway' => 'nullable|string',
+            'provision_system' => 'nullable|in:'.implode(',', array_keys(config('provisioning.systems', []))),
             'theme' => 'nullable|in:default,hijau,biru,oren,ungu,gelap',
             'fb_pixel' => 'nullable|string|max:50',
             'tiktok_pixel' => 'nullable|string|max:50',
@@ -84,7 +86,7 @@ class SalespageController extends Controller
         $this->authorizeOwner($salespage);
         $copy = $salespage->replicate(['visits']);
         $copy->title = $salespage->title.' (salinan)';
-        $copy->slug = \Illuminate\Support\Str::slug($salespage->title).'-'.\Illuminate\Support\Str::lower(\Illuminate\Support\Str::random(4));
+        $copy->slug = Str::slug($salespage->title).'-'.Str::lower(Str::random(4));
         $copy->status = 'draf';
         $copy->visits = 0;
         $copy->save();

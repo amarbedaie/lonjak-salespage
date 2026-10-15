@@ -60,6 +60,13 @@ TXT;
     /** @return array{page: array, source: string} */
     public function generate(array $brief): array
     {
+        if ($this->claudeEnabled()) {
+            try {
+                return ['page' => self::normalizeBlocks($this->viaClaude($brief)), 'source' => 'claude'];
+            } catch (Throwable $e) {
+                report($e);
+            }
+        }
         if ($key = config('services.openrouter.key')) {
             try {
                 return ['page' => self::normalizeBlocks($this->viaOpenRouter($brief, $key)), 'source' => 'openrouter'];
@@ -71,6 +78,47 @@ TXT;
     }
 
     /**
+     * Claude is the active text/LLM provider only when selected AND a key is
+     * present. Falls back to OpenRouter otherwise, so every environment works.
+     */
+    private function claudeEnabled(): bool
+    {
+        return config('ai.provider') === 'claude' && filled(config('ai.claude.api_key'));
+    }
+
+    /** Build a configured Claude Messages-API provider (text copy generation). */
+    private function claude(): \App\Services\AI\ClaudeProvider
+    {
+        return new \App\Services\AI\ClaudeProvider(
+            (string) config('ai.claude.base_url'),
+            config('ai.claude.api_key'),
+            (string) config('ai.claude.model'),
+            (int) config('ai.claude.timeout'),
+            (string) config('ai.claude.version'),
+            (int) config('ai.claude.max_tokens'),
+        );
+    }
+
+    /** Main long-form salespage generation via Claude (mirrors viaOpenRouter). */
+    private function viaClaude(array $brief): array
+    {
+        $content = $this->claude()->chat([
+            ['role' => 'system', 'content' => $this->systemPrompt()],
+            ['role' => 'user', 'content' => $this->prompt($brief)],
+        ], ['json' => true, 'max_tokens' => 8000]);
+
+        if (! $content) {
+            throw new \RuntimeException('Claude: tiada output.');
+        }
+        $data = json_decode($this->extractJson($content), true);
+        if (! isset($data['blocks']) || ! is_array($data['blocks'])) {
+            throw new \RuntimeException('Claude: format tak sah.');
+        }
+
+        return $data;
+    }
+
+    /**
      * Extract a structured brief from a free-form (typed or voiced) product
      * description. Returns keys: name, price, comparePrice, category, audience,
      * problem, benefits, tone — any may be null if not inferable.
@@ -78,7 +126,8 @@ TXT;
     public function extractBrief(string $description): array
     {
         $empty = ['name' => null, 'price' => null, 'comparePrice' => null, 'category' => null, 'audience' => null, 'problem' => null, 'benefits' => null, 'tone' => null];
-        if (! ($key = config('services.openrouter.key'))) {
+        $useClaude = $this->claudeEnabled();
+        if (! $useClaude && ! ($key = config('services.openrouter.key'))) {
             return $empty;
         }
         try {
@@ -87,18 +136,27 @@ TXT;
                 . 'comparePrice (nombor RM harga asal/coret atau null), category, audience (target pelanggan), '
                 . 'problem (masalah diselesaikan), benefits (kelebihan, pisah koma), tone (santai|profesional|agresif). '
                 . 'Teka nilai munasabah jika tak dinyatakan. Jangan reka harga jika tiada — letak null.';
-            $res = Http::withToken($key)
-                ->timeout(60)
-                ->post('https://openrouter.ai/api/v1/chat/completions', [
-                    'model' => config('services.openrouter.model', 'anthropic/claude-haiku-4.5'),
-                    'max_tokens' => 1200,
-                    'response_format' => ['type' => 'json_object'],
-                    'messages' => [
-                        ['role' => 'system', 'content' => $system],
-                        ['role' => 'user', 'content' => $description],
-                    ],
-                ]);
-            $data = json_decode($this->extractJson($res->json('choices.0.message.content') ?? '{}'), true) ?: [];
+            if ($useClaude) {
+                // Cheap structured extraction → Haiku override (keeps copy on Sonnet).
+                $content = $this->claude()->chat([
+                    ['role' => 'system', 'content' => $system],
+                    ['role' => 'user', 'content' => $description],
+                ], ['json' => true, 'max_tokens' => 1200, 'model' => 'claude-haiku-5-5']);
+            } else {
+                $res = Http::withToken($key)
+                    ->timeout(60)
+                    ->post('https://openrouter.ai/api/v1/chat/completions', [
+                        'model' => config('services.openrouter.model', 'anthropic/claude-haiku-4.5'),
+                        'max_tokens' => 1200,
+                        'response_format' => ['type' => 'json_object'],
+                        'messages' => [
+                            ['role' => 'system', 'content' => $system],
+                            ['role' => 'user', 'content' => $description],
+                        ],
+                    ]);
+                $content = $res->json('choices.0.message.content');
+            }
+            $data = json_decode($this->extractJson($content ?? '{}'), true) ?: [];
 
             return [
                 'name' => $data['name'] ?? null,
@@ -211,6 +269,13 @@ TXT;
         ];
         $angles = array_slice($angles, 0, max(1, $count));
 
+        if ($this->claudeEnabled()) {
+            $out = $this->variantsViaClaude($brief, $angles);
+            if ($out) {
+                return $out;
+            }
+        }
+
         if (! ($key = config('services.openrouter.key'))) {
             return array_map(fn () => self::normalizeBlocks($this->mock($brief)), $angles);
         }
@@ -252,6 +317,63 @@ TXT;
         }
 
         return [self::normalizeBlocks($this->mock($brief))];
+    }
+
+    /**
+     * Generate the N angled variants via Claude, still in parallel (Http::pool
+     * against the Anthropic Messages API). Returns [] on total failure so the
+     * caller can fall back to OpenRouter / mock.
+     */
+    private function variantsViaClaude(array $brief, array $angles): array
+    {
+        try {
+            $cfg = config('ai.claude');
+            $model = $cfg['model'] ?: 'claude-sonnet-5-5';
+            $sys = $this->systemPrompt();
+            $userPrompt = $this->prompt($brief);
+            $jsonNudge = "\n\nBalas dengan SATU objek JSON sah sahaja. Jangan tambah teks, ulasan, atau pagar kod (```).";
+
+            $responses = Http::pool(fn ($pool) => array_map(
+                fn ($angle) => $pool
+                    ->withHeaders(['x-api-key' => $cfg['api_key'], 'anthropic-version' => $cfg['version']])
+                    ->acceptJson()
+                    ->timeout(240)
+                    ->post(rtrim($cfg['base_url'], '/') . '/messages', [
+                        'model' => $model,
+                        'max_tokens' => 16000,
+                        'system' => $sys . "\n\nSUDUT VARIASI INI — " . $angle . $jsonNudge,
+                        'messages' => [['role' => 'user', 'content' => $userPrompt]],
+                    ]),
+                $angles
+            ));
+
+            $out = [];
+            foreach ($responses as $res) {
+                try {
+                    if (! ($res instanceof \Illuminate\Http\Client\Response) || $res->failed()) {
+                        continue;
+                    }
+                    $text = '';
+                    foreach ((array) data_get($res->json(), 'content', []) as $block) {
+                        if (($block['type'] ?? null) === 'text') {
+                            $text .= (string) ($block['text'] ?? '');
+                        }
+                    }
+                    $data = json_decode($this->extractJson($text ?: '{}'), true);
+                    if (isset($data['blocks']) && is_array($data['blocks'])) {
+                        $out[] = self::normalizeBlocks($data);
+                    }
+                } catch (Throwable $e) {
+                    // skip a failed variant
+                }
+            }
+
+            return $out;
+        } catch (Throwable $e) {
+            report($e);
+
+            return [];
+        }
     }
 
     /**
